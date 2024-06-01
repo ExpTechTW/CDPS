@@ -35,6 +35,10 @@ pip install cdps
 cd ./my_cdps
 cdps init
 ```
+### 執行
+```
+cdps
+```
 
 
 ## 更新
