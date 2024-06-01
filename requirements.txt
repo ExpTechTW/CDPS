@@ -1,0 +1,12 @@
+certifi==2024.2.2
+charset-normalizer==3.3.2
+idna==3.7
+mariadb==1.1.10
+packaging==24.0
+paho-mqtt==2.1.0
+pytz==2024.1
+requests==2.32.2
+ruamel.yaml==0.18.6
+ruamel.yaml.clib==0.2.8
+typing_extensions==4.11.0
+urllib3==2.2.1

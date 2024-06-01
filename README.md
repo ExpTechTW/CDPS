@@ -6,9 +6,24 @@
 - 複合式防災伺服器
 
 ## 索引
+- [環境](#環境)
+- [開始](#開始)
+- [目錄樹](#目錄樹)
 - [貢獻者](#貢獻者)
 - [發佈規則](#發佈規則)
 - [合作](#合作)
+
+## 環境
+- `Python 3.11.5 (AMD64 on win32)` 
+
+## 開始
+- 初始化 項目 生成 `config.yml`
+```
+python main.py init
+```
+
+## 目錄樹
+- [directory tree](https://github.com/ExpTechTW/CDPS/blob/master/docs/tree.md)
 
 ## 貢獻者
 - whes1015 `文檔`

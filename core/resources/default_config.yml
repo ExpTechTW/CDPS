@@ -1,0 +1,6 @@
+version: 1
+
+# "DEBUG" , "INFO" , "WARN" or "ERROR"
+log_level: "DEBUG"
+
+log_save_days: 7
