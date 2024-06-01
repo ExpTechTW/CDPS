@@ -2,7 +2,6 @@ import sys
 
 from cdps.config import Config
 from cdps.constants import core_constant
-from cdps.health_monitor import start_monitor
 from cdps.plugin.events import EventManager
 from cdps.plugin.manager import Plugin
 from cdps.state import State
@@ -48,5 +47,3 @@ class CDPS:
     def run(self):
         event_manager = EventManager()
         plugin = Plugin(event_manager)
-
-        start_monitor()
