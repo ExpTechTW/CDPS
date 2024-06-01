@@ -4,7 +4,7 @@
 - 這時 `Inject 注入` 就登場了
 - 注入新的 `onServerStartEventForExample` 讓其在 `onServerStartEvent` 前 先被執行
 
-### 原始方法
+### 原始 類、方法
 - cdps/plugin/events.py
 ```py
 class onServerStartEvent(Event):
@@ -56,7 +56,6 @@ original_on_start = cdps.cdps_server.CDPS.on_start
 
 def _new_on_start(self):
     self.event_manager.call_event(onServerStartEventForExample("example"))
-    self.event_manager.call_event(onServerStartEvent("start"))
     original_on_start(self)
 
 cdps.cdps_server.CDPS.on_start = _new_on_start
