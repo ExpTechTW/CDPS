@@ -26,7 +26,7 @@
 
 
 ## 開始
-### 安裝
+### 安裝 [PyPI](https://pypi.org/project/cdps)
 ```
 pip install cdps
 ```
@@ -34,6 +34,10 @@ pip install cdps
 ```
 cd ./my_cdps
 cdps init
+```
+### 執行
+```
+cdps
 ```
 
 
