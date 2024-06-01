@@ -13,6 +13,7 @@
   - [初始化](#初始化)
 - [更新](#更新)
 - [目錄樹](#目錄樹)
+- [擴充](#擴充)
 - [貢獻者](#貢獻者)
 - [發佈規則](#發佈規則)
 - [合作](#合作)
@@ -45,12 +46,10 @@ pip install --upgrade cdps
 ## 目錄樹
 - [directory tree](https://github.com/ExpTechTW/CDPS/blob/master/docs/tree.md)
 
-  ## 目錄樹
-- [directory tree](https://github.com/ExpTechTW/CDPS/blob/master/docs/tree.md)
-
 
 ## 擴充
 - [plugins](https://github.com/ExpTechTW/CDPS/blob/master/docs/plugins.md)
+
 
 ## 貢獻者
 - whes1015 `程式開發` `文檔`
