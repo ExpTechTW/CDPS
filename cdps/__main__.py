@@ -1,8 +1,8 @@
-import entrypoint
+from cdps.entrypoint import entrypoint
 
 
 def main():
-    return entrypoint.entrypoint()
+    return entrypoint()
 
 
 if __name__ == '__main__':
