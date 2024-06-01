@@ -1,11 +1,11 @@
 import sys
 from argparse import ArgumentParser
 
-from core.constants import core_constant
-from core.cli.cli_version import show_version
-from core.cli.cli_init import initialize_environment
-from core.cli.cli_gendefault import generate_default_stuffs
-from core.cli.cli_run import run
+from cdps.cli.cli_gendefault import generate_default_stuffs
+from cdps.cli.cli_init import initialize_environment
+from cdps.cli.cli_run import run
+from cdps.cli.cli_version import show_version
+from cdps.constants import core_constant
 
 
 def cli_dispatch():

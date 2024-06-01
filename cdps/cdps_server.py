@@ -1,10 +1,10 @@
 import sys
 
-from core.config import Config
-from core.state import State
+from cdps.config import Config
+from cdps.constants import core_constant
+from cdps.state import State
+from cdps.utils.logger import Log
 
-from core.utils.logger import Log
-from core.constants import core_constant
 
 class CDPS:
     def __init__(self, *, generate_default_only: bool = False, initialize_environment: bool = False, focus: bool = False):

@@ -1,3 +1,6 @@
 *.pyc
 logs/
 config.yml
+dist/
+CDPS.egg-info/
+build/

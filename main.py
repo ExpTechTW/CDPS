@@ -1,6 +1,6 @@
 import sys
 
-from core.__main__ import main
+from cdps.__main__ import main
 
 if hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix:
     import os

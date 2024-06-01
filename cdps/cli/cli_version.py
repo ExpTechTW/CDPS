@@ -1,4 +1,4 @@
-from core.constants import core_constant
+from cdps.constants import core_constant
 
 
 def show_version(*, quiet: bool = False):

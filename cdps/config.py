@@ -1,9 +1,9 @@
 """
 MCDR config file stuffs
 """
-from typing import Any, Tuple, Dict, Union
+from typing import Any, Dict, Tuple, Union
 
-from core.utils.yaml_data_storage import YamlDataStorage
+from cdps.utils.yaml_data_storage import YamlDataStorage
 
 CONFIG_FILE = 'config.yml'
 DEFAULT_CONFIG_RESOURCE_PATH = '/resources/default_config.yml'

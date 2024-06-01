@@ -1,7 +1,7 @@
 import sys
 
-from core.constants import core_constant
-from core.CDPS import CDPS
+from cdps.cdps_server import CDPS
+from cdps.constants import core_constant
 
 
 def run():

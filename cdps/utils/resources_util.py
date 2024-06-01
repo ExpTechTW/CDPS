@@ -9,9 +9,7 @@ __all__ = [
 from ruamel.yaml import YAML
 from ruamel.yaml.comments import CommentedMap
 
-import pkg_resources
-
-from core.constants import core_constant
+from cdps.constants import core_constant
 
 ROOT_PACKAGE = core_constant.PACKAGE_NAME
 

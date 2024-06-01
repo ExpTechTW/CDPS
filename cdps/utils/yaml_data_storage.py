@@ -4,8 +4,8 @@ from threading import RLock
 from ruamel.yaml import YAML
 from ruamel.yaml.comments import CommentedMap
 
-from core.utils import resources_util, file_util
-from core.utils.lazy_item import LazyItem
+from cdps.utils import file_util, resources_util
+from cdps.utils.lazy_item import LazyItem
 
 
 class YamlDataStorage:

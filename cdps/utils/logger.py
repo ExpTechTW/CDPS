@@ -1,10 +1,11 @@
+import logging
 import os
 import time
-import logging
-import pytz
 from datetime import datetime
-import requests
 from logging.handlers import TimedRotatingFileHandler
+
+import pytz
+import requests
 
 
 class CustomTimedRotatingFileHandler(TimedRotatingFileHandler):

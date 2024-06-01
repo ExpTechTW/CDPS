@@ -1,8 +1,8 @@
 import platform
 import sys
 
-from core.constants import core_constant
-from core.boostrap import boostrap
+from cdps.boostrap import boostrap
+from cdps.constants import core_constant
 
 
 def __environment_check():
@@ -21,5 +21,5 @@ def entrypoint():
     boostrap()
     __environment_check()
 
-    from core.cli import cli_entry
+    from cdps.cli import cli_entry
     cli_entry.cli_dispatch()

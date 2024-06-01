@@ -1,4 +1,4 @@
-from core import entrypoint
+import entrypoint
 
 
 def main():

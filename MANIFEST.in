@@ -1,0 +1,3 @@
+recursive-include cdps/resources *
+include LICENSE
+include requirements.txt

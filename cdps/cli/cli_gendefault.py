@@ -1,6 +1,6 @@
 import os
 
-from core.CDPS import CDPS
+from cdps.cdps_server import CDPS
 
 
 def generate_default_stuffs(*, quiet: bool = False):
