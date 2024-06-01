@@ -28,8 +28,6 @@ def cli_dispatch():
     subparsers.add_parser(
         'init', help='Prepare the working environment of {}. Create commonly used folders and generate default configuration and permission files'.format(core_constant.NAME))
     subparsers.add_parser(
-        'init-focus', help='Prepare the working environment of {}. Create commonly used folders and generate default configuration and permission files'.format(core_constant.NAME))
-    subparsers.add_parser(
         'gendefault', help='Generate default configuration files at current working directory. Existed files will be overwritten')
 
     # parser_pack = subparsers.add_parser('pack', help='Pack files into a packed')
