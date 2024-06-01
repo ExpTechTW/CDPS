@@ -1,13 +1,16 @@
-class EventManager:
-    def __init__(self):
-        self.listeners = {}
+class Event:
+    pass
 
-    def on(self, event_type, listener):
-        if event_type not in self.listeners:
-            self.listeners[event_type] = []
-        self.listeners[event_type].append(listener)
 
-    def publish(self, event_type, data):
-        if event_type in self.listeners:
-            for listener in self.listeners[event_type]:
-                listener(data)
+class onServerStartEvent(Event):
+    """ 當 伺服器 啟動 """
+
+    def __init__(self, pid):
+        self.pid = pid
+
+
+class onServerCloseEvent(Event):
+    """ 當 伺服器 關閉 """
+
+    def __init__(self, reason):
+        self.reason = reason

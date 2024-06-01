@@ -6,7 +6,7 @@ from cdps.cli.cli_init import initialize_environment
 from cdps.cli.cli_run import run
 from cdps.cli.cli_version import show_version
 from cdps.constants import core_constant
-
+from cdps.utils.pack import pack
 
 def cli_dispatch():
     if len(sys.argv) == 1:
@@ -30,8 +30,8 @@ def cli_dispatch():
     subparsers.add_parser(
         'gendefault', help='Generate default configuration files at current working directory. Existed files will be overwritten')
 
-    # parser_pack = subparsers.add_parser('pack', help='Pack files into a packed')
-    # parser_pack.add_argument('-n', '--name', help='A specific name to the output file. If not given the metadata specific name or a default one will be used', default=None)
+    parser_pack = subparsers.add_parser('pack', help='Pack files into a packed')
+    parser_pack.add_argument('-n', '--name', help='A specific name to the output file. If not given the metadata specific name or a default one will be used', default=None)
 
     args = parser.parse_args()
 
@@ -45,5 +45,5 @@ def cli_dispatch():
         initialize_environment(quiet=args.quiet)
     elif args.subparser_name == 'gendefault':
         generate_default_stuffs(quiet=args.quiet)
-    # elif args.subparser_name == 'pack':
-    # 	make_packed(args, quiet=args.quiet)
+    elif args.subparser_name == 'pack':
+    	pack(args, quiet=args.quiet)

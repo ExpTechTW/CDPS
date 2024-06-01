@@ -1,9 +1,10 @@
 import sys
+import time
 
 from cdps.config import Config
 from cdps.constants import core_constant
-from cdps.plugin.events import EventManager
-from cdps.plugin.manager import Plugin
+from cdps.plugin.events import onServerCloseEvent, onServerStartEvent
+from cdps.plugin.manager import Manager, Plugin
 from cdps.state import State
 from cdps.utils.logger import Log
 
@@ -45,5 +46,12 @@ class CDPS:
             return False
 
     def run(self):
-        event_manager = EventManager()
+        event_manager = Manager()
         plugin = Plugin(event_manager)
+        all_plugins = plugin.get_all_plugins()
+        plugin.load_plugins(all_plugins)
+
+        while True:
+            event_manager.call_event(onServerStartEvent("start"))
+            event_manager.call_event(onServerCloseEvent("close"))
+            time.sleep(1)
