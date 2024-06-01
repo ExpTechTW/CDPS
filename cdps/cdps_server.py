@@ -7,7 +7,7 @@ from cdps.utils.logger import Log
 
 
 class CDPS:
-    def __init__(self, *, generate_default_only: bool = False, initialize_environment: bool = False, focus: bool = False):
+    def __init__(self, *, generate_default_only: bool = False, initialize_environment: bool = False):
         self.log = Log()
         self.log.logger.info("Start {} {}".format(
             core_constant.NAME, core_constant.VERSION))
@@ -20,7 +20,7 @@ class CDPS:
             return
 
         if initialize_environment:
-            if not self.config.file_presents() or focus:
+            if not self.config.file_presents():
                 self.config.save_default()
 
         try:

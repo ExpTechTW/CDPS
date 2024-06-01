@@ -30,7 +30,7 @@ def cli_dispatch():
     subparsers.add_parser(
         'init-focus', help='Prepare the working environment of {}. Create commonly used folders and generate default configuration and permission files'.format(core_constant.NAME))
     subparsers.add_parser(
-        'gendefault', help='Generate default configuration and permission files at current working directory. Existed files will be overwritten')
+        'gendefault', help='Generate default configuration files at current working directory. Existed files will be overwritten')
 
     # parser_pack = subparsers.add_parser('pack', help='Pack files into a packed')
     # parser_pack.add_argument('-n', '--name', help='A specific name to the output file. If not given the metadata specific name or a default one will be used', default=None)
@@ -45,8 +45,6 @@ def cli_dispatch():
         run()
     elif args.subparser_name == 'init':
         initialize_environment(quiet=args.quiet)
-    elif args.subparser_name == 'init-focus':
-        initialize_environment(quiet=args.quiet, focus=True)
     elif args.subparser_name == 'gendefault':
         generate_default_stuffs(quiet=args.quiet)
     # elif args.subparser_name == 'pack':
