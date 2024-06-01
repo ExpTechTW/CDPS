@@ -31,10 +31,6 @@ class CDPS:
             self.log.logger.setLevel(self.config._data['log_level'])
             self.log.logger.day = self.config._data['log_save_days']
             self.log.clean_old_logs()
-
-            if self.config._data['discord_webhook']['enable']:
-                self.log.setup_discord(
-                    url=self.config._data['discord_webhook']['url'], level=self.config._data['discord_webhook']['log_level'])
         except Exception as e:
             self.log.logger.error(
                 "Please use the [init] command to initialize the project")
