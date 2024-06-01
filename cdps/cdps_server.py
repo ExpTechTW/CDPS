@@ -44,14 +44,20 @@ class CDPS:
             return True
         else:
             return False
+        
+    def on_start(self):
+        self.event_manager.call_event(onServerStartEvent("start"))
+        print(123)
 
     def run(self):
-        event_manager = Manager()
-        plugin = Plugin(event_manager)
+        self.event_manager = Manager()
+        plugin = Plugin(self.event_manager)
         all_plugins = plugin.get_all_plugins()
         plugin.load_plugins(all_plugins)
 
         while True:
-            event_manager.call_event(onServerStartEvent("start"))
-            event_manager.call_event(onServerCloseEvent("close"))
+            self.on_start()
             time.sleep(1)
+
+    
+        # self.event_manager.call_event(onServerCloseEvent("close"))
