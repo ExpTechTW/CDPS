@@ -2,32 +2,31 @@
 ## directory tree
 ```
 CDPS/
-    config.yml    // 配置文件
-    main.py    // 入口點
-    core/
-        boostrap.py    // 環境檢查
-        config.py    // 配置讀取
-        CWAReportSQL.py
+    main.py
+    MANIFEST.in
+    requirements.txt
+    setup.py
+    cdps/
+        boostrap.py
+        cdps_server.py
+        config.py
         entrypoint.py
-        state.py    // 狀態管理
+        state.py
         __init__.py
         __main__.py
         api/
-            sql/
-                sql.py
-                __init__.py
         cli/
-            cli_entry.py    // CLI 入口
-            cli_gendefault.py    // CLI 生成默認(覆蓋) 配置
-            cli_init.py    // CLI 初始化 項目
-            cli_run.py    // CLI 執行項目
-            cli_version.py    // CLI 顯示版本資訊
+            cli_entry.py
+            cli_gendefault.py
+            cli_init.py
+            cli_run.py
+            cli_version.py
             __init__.py
         constants/
-            core_constant.py    // 常量
+            core_constant.py
             __init__.py
         resources/
-            default_config.yml    // 默認配置文件
+            default_config.yml
         utils/
             file_util.py
             lazy_item.py
@@ -36,6 +35,6 @@ CDPS/
             yaml_data_storage.py
             __init__.py
     docs/
-    logs/
-    schemas/
+    plugins/
+    tests/
 ```
