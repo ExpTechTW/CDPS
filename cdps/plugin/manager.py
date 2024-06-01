@@ -45,7 +45,7 @@ class Plugin():
             full_path = os.path.join(directory_path, entry)
             if os.path.isfile(full_path):
                 if ".cdps" in full_path:
-                    full_path_folder = full_path.replace(".zip", "")
+                    full_path_folder = full_path.replace(".cdps", "")
                     if os.path.exists(full_path_folder):
                         shutil.rmtree(full_path_folder)
                     with zipfile.ZipFile(full_path, 'r') as zip_ref:
