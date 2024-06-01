@@ -14,12 +14,24 @@
 - [合作](#合作)
 
 ## 環境
-- `Python 3.11.5 (AMD64 on win32)` 
+> [!WARNING]
+> 3.10.0 為 `開發環境` 其他版本未經測試
+- `Python 3.10.0 (AMD64 on win32)` 
 
 ## 開始
-- 初始化 項目 生成 `config.yml`
+### 安裝
 ```
-python main.py init
+pip install cdps
+```
+### 初始化
+```
+cd ./my_cdps
+cdps init
+```
+
+## 更新
+```
+pip install --upgrade cdps
 ```
 
 ## 目錄樹
