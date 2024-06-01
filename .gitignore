@@ -5,4 +5,4 @@ dist/
 CDPS.egg-info/
 build/
 dev/
-cdps/plugin/
+plugins/
