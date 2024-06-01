@@ -6,6 +6,8 @@
 
 - 複合式防災サーバー
 
+**日本語** | [中文](https://github.com/ExpTechTW/CDPS/blob/master/README.md)
+
 ## インデックス
 
 - [環境](#環境)

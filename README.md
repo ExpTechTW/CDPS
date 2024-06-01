@@ -57,11 +57,11 @@ pip install --upgrade cdps
 
 ## 目錄樹
 
-- [directory tree](https://github.com/ExpTechTW/CDPS/blob/master/docs/tree.md)
+- [directory tree](https://github.com/ExpTechTW/CDPS/blob/master/docs/zh/developer/tree.md)
 
 ## 擴充
 
-- [plugins](https://github.com/ExpTechTW/CDPS/blob/master/docs/plugins.md)
+- [plugins](https://github.com/ExpTechTW/CDPS/blob/master/docs/zh/user/plugins.md)
 
 ## 貢獻者
 
