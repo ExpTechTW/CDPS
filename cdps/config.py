@@ -8,7 +8,6 @@ from cdps.utils.yaml_data_storage import YamlDataStorage
 CONFIG_FILE = 'config.yml'
 DEFAULT_CONFIG_RESOURCE_PATH = '/resources/default_config.yml'
 
-
 class Config(YamlDataStorage):
     def __init__(self):
         super().__init__(CONFIG_FILE, DEFAULT_CONFIG_RESOURCE_PATH)

@@ -5,7 +5,6 @@ from datetime import datetime
 from logging.handlers import TimedRotatingFileHandler
 
 import pytz
-import requests
 
 
 class CustomTimedRotatingFileHandler(TimedRotatingFileHandler):
@@ -50,48 +49,17 @@ class SingletonMeta(type):
         return cls._instances[cls]
 
 
-class DiscordHandler(logging.Handler):
-    def __init__(self, webhook_url):
-        super().__init__()
-        self.webhook_url = webhook_url
-
-    def emit(self, record):
-        current_time = datetime.now(pytz.timezone(
-            'Asia/Taipei')).strftime('%Y-%m-%d %H:%M:%S')
-
-        embed = {
-            "embeds": [
-                {
-                    "title": "{} | {}".format(current_time, record.levelname),
-                    "description": record.message,
-                    "color": self.get_color(record.levelname)
-                }
-            ]
-        }
-
-        try:
-            requests.post(self.webhook_url, json=embed)
-        except requests.RequestException as e:
-            print(f"Error during post to discord : {e}")
-
-    def get_color(self, levelname):
-        if levelname == 'DEBUG':
-            return 0x0000ff
-        elif levelname == 'INFO':
-            return 0x00ff00
-        elif levelname == 'WARNING':
-            return 0xffa500
-        elif levelname == 'ERROR':
-            return 0xff0000
-        else:
-            return 0x000000
-
-
 class Log(metaclass=SingletonMeta):
     def __init__(self, *, url=None):
         self.log_dir = os.path.join(".", "logs")
         if not os.path.exists(self.log_dir):
             os.makedirs(self.log_dir)
+        self.config_dir = os.path.join(".", "config")
+        if not os.path.exists(self.config_dir):
+            os.makedirs(self.config_dir)
+        self.plugins_dir = os.path.join(".", "plugins")
+        if not os.path.exists(self.plugins_dir):
+            os.makedirs(self.plugins_dir)
         self.logger = self.setup_logger(url=url)
         self.logger.day = 7
 
@@ -119,16 +87,6 @@ class Log(metaclass=SingletonMeta):
         logger.addHandler(console_handler)
 
         return logger
-
-    def setup_discord(self, *, url=None, level="DEBUG"):
-        discord_handler = DiscordHandler(url)
-        discord_handler.setLevel(level)
-        tz_utc_8 = pytz.timezone('Asia/Taipei')
-        formatter = CustomFormatter(
-            '[%(asctime)s][%(levelname)s]: %(message)s', '%H:%M:%S', tz_utc_8
-        )
-        discord_handler.setFormatter(formatter)
-        self.logger.addHandler(discord_handler)
 
     def clean_old_logs(self):
         now = time.time()
