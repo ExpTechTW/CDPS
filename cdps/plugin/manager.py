@@ -1,4 +1,5 @@
 import importlib
+from importlib.metadata import distribution
 import json
 import os
 import shutil
@@ -98,10 +99,20 @@ class Plugin():
         for plugin in plugins_list:
             for key, value in plugins_info[plugin]['dependencies'].items():
                 if plugins_info.get(key) is None:
-                    self.log.logger.error(
-                        "Plugin [ {} ] Need Install Dependencies ( {} {} )".format(plugin, key, value))
-                    if plugin not in to_remove:
-                        to_remove.append(plugin)
+                    if importlib.util.find_spec(key) is None:
+                        self.log.logger.error(
+                            "Plugin [ {} ] Need Install Dependencies ( {} {} )".format(plugin, key, value))
+                        if plugin not in to_remove:
+                            to_remove.append(plugin)
+                    else:
+                        dist = distribution(key)
+                        ver_use = Version(dist.version)
+                        ver_need = Version(value.replace(">=", ""))
+                        if ver_use < ver_need:
+                            self.log.logger.error(
+                                "Plugin [ {} ] Need Upgrade Dependencies ( {} {} )".format(plugin, key, value))
+                            if plugin not in to_remove:
+                                to_remove.append(plugin)
                 else:
                     ver_use = Version(plugins_info[key]['version'])
                     ver_need = Version(value.replace(">=", ""))
