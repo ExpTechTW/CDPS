@@ -14,3 +14,10 @@ class onServerCloseEvent(Event):
 
     def __init__(self, reason):
         self.reason = reason
+
+
+class onCommandEvent(Event):
+    """ 當 用戶輸入 到 控制台 """
+
+    def __init__(self, command):
+        self.command = command

@@ -66,6 +66,9 @@ pip install --upgrade cdps
 ## 貢獻者
 
 - whes1015 `程式開發` `文檔`
+- yayacat `程式開發` `文檔`
+- PiscesXD `程式開發` `文檔`
+- Yoyochou0901 `程式開發` `文檔`
 
 ---
 
@@ -79,3 +82,7 @@ pip install --upgrade cdps
 ## 合作
 
 - 若有任何可以改進的地方，歡迎使用 `Pull requests` 來提交
+
+<a href="https://github.com/ExpTechTW/CDPS/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=ExpTechTW/CDPS" />
+</a>

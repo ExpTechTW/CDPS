@@ -192,7 +192,7 @@ class Plugin():
             self.log.logger.info("Plugin [ {} ] Reloaded ( {} )".format(
                 name, self.plugins_info[name]['version']))
         else:
-            self.log.logger.error("Plugin [ {} ] Reload Failed".format(name))
+            self.log.logger.error("Plugin [ {} ] Not Found".format(name))
 
     def __reload_module__(self, module_name, path_to_module, completion_event=None):
         if module_name in self.modules:

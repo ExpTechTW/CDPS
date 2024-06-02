@@ -66,6 +66,9 @@ pip install --upgrade cdps
 ## 貢献者
 
 - whes1015 `プログラム開発` `ドキュメント`
+- yayacat `プログラム開発` `ドキュメント`
+- PiscesXD `プログラム開発` `ドキュメント`
+- Yoyochou0901 `プログラム開発` `ドキュメント`
 
 ---
 
@@ -79,3 +82,7 @@ pip install --upgrade cdps
 ## 協力
 
 - 改善できる点があれば、`Pull requests`を使って提案してください。
+
+<a href="https://github.com/ExpTechTW/CDPS/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=ExpTechTW/CDPS" />
+</a>
