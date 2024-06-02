@@ -44,6 +44,7 @@ cdps.cdps_server.CDPS.on_start = _new_on_start
 
 ## 完成看起來像這樣
 ```py
+from cdps.plugin.manager import Manager , Listener
 from cdps.plugin.events import Event
 import cdps.cdps_server
 
