@@ -66,10 +66,10 @@ class Plugin():
                         all_plugins.append(entry)
                     else:
                         self.log.logger.error(
-                            "Plugin {} Load Failed (cdps.json)".format(entry))
+                            "Plugin [ {} ] Load Failed (cdps.json)".format(entry))
                 else:
                     self.log.logger.error(
-                        "Plugin {} Load Failed (main.py)".format(entry))
+                        "Plugin [ {} ] Load Failed (main.py)".format(entry))
         return all_plugins
 
     def load_info(self, plugins_info, plugins_list):
@@ -86,13 +86,13 @@ class Plugin():
             for key, value in plugins_info[plugin]['dependencies'].items():
                 if plugins_info[key] is None:
                     self.log.logger.error(
-                        "Plugin {} Need Install Dependencies {} {}".format(plugin, key, value))
+                        "Plugin [ {} ] Need Install Dependencies ( {} {} )".format(plugin, key, value))
                 else:
                     ver_use = Version(plugins_info[key]['version'])
                     ver_need = Version(value.replace(">=", ""))
                     if ver_use < ver_need:
                         self.log.logger.error(
-                            "Plugin {} Need Upgrade Dependencies {} {}".format(plugin, key, value))
+                            "Plugin [ {} ] Need Upgrade Dependencies ( {} {} )".format(plugin, key, value))
                         if plugin not in to_remove:
                             to_remove.append(plugin)
         for plugin in to_remove:
@@ -106,11 +106,11 @@ class Plugin():
             if os.path.isfile(os.path.join(full_path, "config.json")):
                 if not os.path.isfile(config_path):
                     self.log.logger.warning(
-                        "Plugin {} Config Generate".format(plugin))
+                        "Plugin [ {} ] Config Generate".format(plugin))
                     shutil.copy(os.path.join(
                         full_path, "config.json"), config_path)
             self.__reload_module__(plugin, os.path.join(full_path, "main.py"))
-            self.log.logger.info("Plugin {} Loaded".format(plugin))
+            self.log.logger.info("Plugin [ {} ] Loaded".format(plugin))
             loaded_plugins_list.append(plugin)
         return loaded_plugins_list
 
