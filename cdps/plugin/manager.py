@@ -84,7 +84,7 @@ class Plugin():
         to_remove = []
         for plugin in plugins_list:
             for key, value in plugins_info[plugin]['dependencies'].items():
-                if plugins_info[key] is None:
+                if plugins_info.get(key) is None:
                     self.log.logger.error(
                         "Plugin [ {} ] Need Install Dependencies ( {} {} )".format(plugin, key, value))
                 else:
