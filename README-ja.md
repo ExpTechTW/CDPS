@@ -66,6 +66,9 @@ pip install --upgrade cdps
 ## 貢献者
 
 - whes1015 `プログラム開発` `ドキュメント`
+- yayacat `プログラム開発` `ドキュメント`
+- PiscesXD `プログラム開発` `ドキュメント`
+- Yoyochou0901 `プログラム開発` `ドキュメント`
 
 ---
 
