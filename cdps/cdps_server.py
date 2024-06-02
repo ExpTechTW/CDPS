@@ -47,7 +47,6 @@ class CDPS:
         
     def on_start(self):
         self.event_manager.call_event(onServerStartEvent("start"))
-        print(123)
 
     def run(self):
         self.event_manager = Manager()
