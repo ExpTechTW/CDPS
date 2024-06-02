@@ -49,17 +49,22 @@ class CDPS:
         self.event_manager.call_event(onServerStartEvent("start"))
 
     def run(self):
-        self.event_manager = Manager()
-        plugin = Plugin(self.log, self.event_manager)
-        self.all_plugins = plugin.get_all_plugins()
-        self.plugins_info = {"cdps": core_constant.INFO}
-        plugin.load_info(
-            self.plugins_info, self.all_plugins)
-        plugin.dependencies(self.plugins_info, self.all_plugins)
-        plugin.load_plugins(self.all_plugins)
+        try:
+            self.event_manager = Manager()
+            plugin = Plugin(self.log, self.event_manager)
+            self.all_plugins = plugin.get_all_plugins()
+            self.plugins_info = {"cdps": core_constant.INFO}
+            plugin.load_info(
+                self.plugins_info, self.all_plugins)
+            plugin.dependencies(self.plugins_info, self.all_plugins)
+            plugin.load_plugins(self.all_plugins)
 
-        while True:
-            self.on_start()
-            time.sleep(1)
+            while True:
+                self.on_start()
+                time.sleep(1)
 
-        # self.event_manager.call_event(onServerCloseEvent("close"))
+            # self.event_manager.call_event(onServerCloseEvent("close"))
+        except KeyboardInterrupt:
+            print("Program was stopped by user")
+        finally:
+            print("Exiting the program...")
