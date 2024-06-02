@@ -125,12 +125,7 @@ class Plugin():
                 if key == plugin:
                     continue
                 if plugins_info.get(key) is None:
-                    if find_spec(key) is None:
-                        self.log.logger.error(
-                            "Plugin [ {} ] Need Install pip Dependencies ( {} {} )".format(plugin, key, value))
-                        if plugin not in to_remove:
-                            to_remove.append(plugin)
-                    else:
+                    if find_spec(key) is not None:
                         dist = distribution(key)
                         ver_use = Version(dist.version)
                         ver_need = Version(value.replace(">=", ""))
