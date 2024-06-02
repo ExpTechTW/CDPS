@@ -1,4 +1,5 @@
 import importlib
+from importlib.util import find_spec
 from importlib.metadata import distribution
 import json
 import os
@@ -113,6 +114,31 @@ class Plugin():
                             "Plugin [ {} ] Need Upgrade Dependencies ( {} {} )".format(plugin, key, value))
                         if plugin not in to_remove:
                             to_remove.append(plugin)
+        for plugin in to_remove:
+            plugins_list.remove(plugin)
+
+    def pipdependencies(self, plugins_info: list, plugins_list: list):
+        to_remove = []
+        for plugin in plugins_list:
+            for key, value in plugins_info[plugin]['dependencies'].items():
+                if key == plugin:
+                    continue
+                if plugins_info.get(key) is None:
+                    if find_spec(key) is None:
+                        self.log.logger.error(
+                            "Plugin [ {} ] Need Install Dependencies ( {} {} )".format(plugin, key, value))
+                        if plugin not in to_remove:
+                            to_remove.append(plugin)
+                    else:
+                        print(key)
+                        dist = distribution(key)
+                        ver_use = Version(dist.version)
+                        ver_need = Version(value.replace(">=", ""))
+                        if ver_use < ver_need:
+                            self.log.logger.error(
+                                "Plugin [ {} ] Need Upgrade Dependencies ( {} {} )".format(plugin, key, value))
+                            if plugin not in to_remove:
+                                to_remove.append(plugin)
         for plugin in to_remove:
             plugins_list.remove(plugin)
 
