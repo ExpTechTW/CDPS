@@ -132,8 +132,10 @@ class Plugin():
                         full_path, "config.json"), config_path)
                     self.log.logger.warning(
                         f"Plugin [ {plugin} ] Config Generated")
-                self.__reload_module__(
-                    plugin, os.path.join(full_path, "main.py"))
+                completion_event = threading.Event()
+                self.__reload_module__(plugin, os.path.join(
+                    directory_path, plugin, "main.py"), completion_event)
+                completion_event.wait()
                 self.log.logger.info(
                     f"Plugin [ {plugin} ] Loaded ( {self.plugins_info[plugin]['version']} )")
                 self.loaded_plugins_list.append(plugin)
@@ -157,7 +159,7 @@ class Plugin():
         else:
             self.log.logger.error("Plugin [ {} ] Reload Failed".format(name))
 
-    def __reload_module__(self, module_name, path_to_module):
+    def __reload_module__(self, module_name, path_to_module, completion_event=None):
         if module_name in self.modules:
             self.stop_module(module_name)
 
@@ -171,6 +173,11 @@ class Plugin():
             spec.loader.exec_module(module)
             if hasattr(module, 'task'):
                 module.task(stop_event)
+            if self.plugins_info[module_name].get('focus-load', False) and hasattr(module, 'initialize'):
+                module.initialize(completion_event)
+            else:
+                completion_event.set()
+
         thread = threading.Thread(target=load_and_run_module)
         thread.daemon = True
         thread.start()
@@ -214,6 +221,6 @@ class Plugin():
             unresolved_dependencies.pop(plugin_name)
 
         for plugin, info in self.plugins_info.items():
-            add_plugin(plugin, info.get('preload', False))
+            add_plugin(plugin, info.get('pre-load', False))
 
         return preloaded_plugins + normal_load_order

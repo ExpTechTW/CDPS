@@ -52,6 +52,7 @@ class SingletonMeta(type):
     def reset_instance(cls, instance_cls):
         if instance_cls in cls._instances:
             del cls._instances[instance_cls]
+        cls._instances[instance_cls] = instance_cls()
 
 
 class Log(metaclass=SingletonMeta):
