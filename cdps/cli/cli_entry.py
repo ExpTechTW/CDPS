@@ -8,6 +8,7 @@ from cdps.cli.cli_version import show_version
 from cdps.constants import core_constant
 from cdps.utils.pack import pack
 
+
 def cli_dispatch():
     if len(sys.argv) == 1:
         run()

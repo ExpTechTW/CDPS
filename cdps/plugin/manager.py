@@ -1,4 +1,5 @@
 import importlib
+import json
 import os
 import shutil
 import sys
@@ -66,7 +67,18 @@ class Plugin():
                         "Plugin {} Load Failed".format(entry))
         return all_plugins
 
+    def load_info(self, plugins_info, plugins_list):
+        for plugin in plugins_list:
+            full_path = os.path.join(directory_path, plugin)
+            with open(os.path.join(full_path, "cdps.json"), 'r', encoding='utf-8') as file:
+                data = json.load(file)
+                plugins_info[plugin] = data
+
+    def dependencies():
+        
+
     def load_plugins(self, plugins_list):
+        loaded_plugins_list = []
         for plugin in plugins_list:
             config_path = os.path.join("./config/", "{}.json".format(plugin))
             full_path = os.path.join(directory_path, plugin)
@@ -75,13 +87,14 @@ class Plugin():
                     "Plugin {} Config Generate".format(plugin))
                 shutil.copy(os.path.join(
                     full_path, "config.json"), config_path)
-            self.reload_module(plugin, os.path.join(full_path, "main.py"))
+            self.__reload_module__(plugin, os.path.join(full_path, "main.py"))
             self.log.logger.info("Plugin {} Loaded".format(plugin))
+            loaded_plugins_list.append(plugin)
+        return loaded_plugins_list
 
-    def reload_module(self, module_name, path_to_module):
+    def __reload_module__(self, module_name, path_to_module):
         spec = importlib.util.spec_from_file_location(
             module_name, path_to_module)
         module = importlib.util.module_from_spec(spec)
         sys.modules[module_name] = module
         spec.loader.exec_module(module)
-        return module

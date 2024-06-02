@@ -51,8 +51,11 @@ class CDPS:
     def run(self):
         self.event_manager = Manager()
         plugin = Plugin(self.log, self.event_manager)
-        all_plugins = plugin.get_all_plugins()
-        plugin.load_plugins(all_plugins)
+        self.all_plugins = plugin.get_all_plugins()
+        self.plugins_info = {}
+        plugin.load_info(
+            self.plugins_info, self.all_plugins)
+        plugin.load_plugins(self.all_plugins)
 
         while True:
             self.on_start()
