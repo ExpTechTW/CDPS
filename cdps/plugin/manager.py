@@ -116,16 +116,22 @@ class Plugin():
                                     "Plugin [ {} ] Need Upgrade pip Dependencies ( {} {} )".format(plugin, key, value))
                                 if plugin not in to_remove:
                                     to_remove.append(plugin)
+                                if plugins_info.get(plugin) is not None:
+                                    del self.plugins_info[plugin]
                         else:
                             self.log.logger.error(
                                 "Plugin [ {} ] Need Install pip Dependencies ( {} {} )".format(plugin, key, value))
                             if plugin not in to_remove:
                                 to_remove.append(plugin)
+                            if plugins_info.get(plugin) is not None:
+                                del self.plugins_info[plugin]
                     else:
                         self.log.logger.error(
                             "Plugin [ {} ] Need Install Dependencies ( {} {} )".format(plugin, key, value))
                         if plugin not in to_remove:
                             to_remove.append(plugin)
+                        if plugins_info.get(plugin) is not None:
+                            del self.plugins_info[plugin]
                 else:
                     ver_use = Version(plugins_info[key]['version'])
                     ver_need = Version(value.replace(">=", ""))
@@ -134,7 +140,8 @@ class Plugin():
                             "Plugin [ {} ] Need Upgrade Dependencies ( {} {} )".format(plugin, key, value))
                         if plugin not in to_remove:
                             to_remove.append(plugin)
-                        del self.plugins_info[plugin]
+                        if plugins_info.get(plugin) is not None:
+                            del self.plugins_info[plugin]
         for plugin in to_remove:
             plugins_list.remove(plugin)
 
@@ -150,7 +157,7 @@ class Plugin():
 
     def load_plugins(self, plugins_list):
         try:
-            plugin_load_list = self.get_load_list()
+            plugin_load_list = self.get_load_list(plugins_list)
             plugin_load_list.remove("cdps")
             for plugin in plugin_load_list:
                 config_path = os.path.join("./config/", f"{plugin}.json")
@@ -224,7 +231,7 @@ class Plugin():
             stop_event.set()
             thread.join(timeout=5)
 
-    def get_load_list(self):
+    def get_load_list(self, plugins_list):
         preloaded_plugins = []
         normal_load_order = []
         unresolved_dependencies = {}
@@ -239,7 +246,9 @@ class Plugin():
             plugin_info = self.plugins_info.get(plugin_name, {})
             dependencies = plugin_info.get('dependencies', [])
             for dependency in dependencies:
-                add_plugin(dependency, is_preload)  # 继承父插件的预加载状态
+                for plugin in plugins_list:
+                    if dependency == plugin:
+                        add_plugin(dependency, is_preload)  # 继承父插件的预加载状态
 
             if is_preload:
                 preloaded_plugins.append(plugin_name)
