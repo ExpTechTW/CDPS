@@ -1,13 +1,13 @@
-import sys
 import os
+import sys
 
 from cdps.config import Config
+from cdps.console.cdps import console_cdps
 from cdps.constants import core_constant
 from cdps.plugin.events import onServerCloseEvent, onServerStartEvent
 from cdps.plugin.manager import Manager, Plugin
 from cdps.state import State
 from cdps.utils.logger import Log
-from cdps.console.cdps import console_cdps
 
 
 class CDPS:
@@ -72,7 +72,7 @@ class CDPS:
                         console_cdps(args)
         except KeyboardInterrupt as e:
             self.on_close(1)
+            plugin.stop_all_modules()
             print("Program was stopped by user")
         finally:
-            # plugin.stop_all_modules()
             print("Exiting the program...")
