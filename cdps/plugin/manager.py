@@ -59,6 +59,7 @@ class Plugin():
         self.log = log
         self.event_manager = event_manager
         self.modules = {}
+        self.plugins_info = {}
         self.all_stopped = threading.Event()
         self.lock = threading.Lock()
         self.loaded_plugins_list = []
@@ -87,6 +88,7 @@ class Plugin():
         return all_plugins
 
     def load_info(self, plugins_info, plugins_list):
+        self.plugins_info = plugins_info
         for plugin in plugins_list:
             full_path = os.path.join(directory_path, plugin)
             if os.path.isfile(os.path.join(full_path, "cdps.json")):
@@ -126,7 +128,8 @@ class Plugin():
                 self.log.logger.warning(
                     f"Plugin [ {plugin} ] Config Generated")
             self.__reload_module__(plugin, os.path.join(full_path, "main.py"))
-            self.log.logger.info(f"Plugin [ {plugin} ] Loaded")
+            self.log.logger.info(
+                f"Plugin [ {plugin} ] Loaded ( {self.plugins_info[plugin]['version']} )")
             self.loaded_plugins_list.append(plugin)
         return self.loaded_plugins_list
 
@@ -141,7 +144,8 @@ class Plugin():
                     shutil.copy(os.path.join(
                         full_path, "config.json"), config_path)
             self.__reload_module__(name, os.path.join(full_path, "main.py"))
-            self.log.logger.info("Plugin [ {} ] Reloaded".format(name))
+            self.log.logger.info("Plugin [ {} ] Reloaded ( {} )".format(
+                name, self.plugins_info[name]['version']))
         else:
             self.log.logger.error("Plugin [ {} ] Reload Failed".format(name))
 
