@@ -52,9 +52,10 @@ class CDPS:
         self.event_manager = Manager()
         plugin = Plugin(self.log, self.event_manager)
         self.all_plugins = plugin.get_all_plugins()
-        self.plugins_info = {}
+        self.plugins_info = {"cdps": core_constant.INFO}
         plugin.load_info(
             self.plugins_info, self.all_plugins)
+        plugin.dependencies(self.plugins_info, self.all_plugins)
         plugin.load_plugins(self.all_plugins)
 
         while True:
