@@ -163,10 +163,13 @@ class Plugin():
 
     def stop_module(self, module_name):
         if module_name in self.modules:
-            _, stop_event = self.modules[module_name]
+            thread, stop_event = self.modules[module_name]
             stop_event.set()
-            self.log.logger.warning("Plugin [ {} ] Unloaded".format(module_name))
+            thread.join(timeout=5)
+            self.log.logger.warning(
+                "Plugin [ {} ] Unloaded".format(module_name))
 
     def stop_all_modules(self):
-        for _, (_, stop_event) in self.modules.items():
+        for _, (thread, stop_event) in self.modules.items():
             stop_event.set()
+            thread.join(timeout=5)
