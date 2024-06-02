@@ -82,3 +82,7 @@ pip install --upgrade cdps
 ## 合作
 
 - 若有任何可以改進的地方，歡迎使用 `Pull requests` 來提交
+
+<a href="https://github.com/ExpTechTW/CDPS/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=ExpTechTW/CDPS" />
+</a>
