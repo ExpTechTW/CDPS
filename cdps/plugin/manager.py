@@ -107,6 +107,7 @@ class Plugin():
                         "Plugin [ {} ] Need Install Dependencies ( {} {} )".format(plugin, key, value))
                     if plugin not in to_remove:
                         to_remove.append(plugin)
+                    del self.plugins_info[plugin]
                 else:
                     ver_use = Version(plugins_info[key]['version'])
                     ver_need = Version(value.replace(">=", ""))
@@ -115,23 +116,30 @@ class Plugin():
                             "Plugin [ {} ] Need Upgrade Dependencies ( {} {} )".format(plugin, key, value))
                         if plugin not in to_remove:
                             to_remove.append(plugin)
+                        del self.plugins_info[plugin]
         for plugin in to_remove:
             plugins_list.remove(plugin)
 
     def load_plugins(self, plugins_list):
-        for plugin in plugins_list:
-            config_path = os.path.join("./config/", f"{plugin}.json")
-            full_path = os.path.join(directory_path, plugin)
-            if os.path.isfile(os.path.join(full_path, "config.json")) and not os.path.isfile(config_path):
-                shutil.copy(os.path.join(
-                    full_path, "config.json"), config_path)
-                self.log.logger.warning(
-                    f"Plugin [ {plugin} ] Config Generated")
-            self.__reload_module__(plugin, os.path.join(full_path, "main.py"))
-            self.log.logger.info(
-                f"Plugin [ {plugin} ] Loaded ( {self.plugins_info[plugin]['version']} )")
-            self.loaded_plugins_list.append(plugin)
-        return self.loaded_plugins_list
+        try:
+            plugin_load_list = self.get_load_list()
+            plugin_load_list.remove("cdps")
+            for plugin in plugin_load_list:
+                config_path = os.path.join("./config/", f"{plugin}.json")
+                full_path = os.path.join(directory_path, plugin)
+                if os.path.isfile(os.path.join(full_path, "config.json")) and not os.path.isfile(config_path):
+                    shutil.copy(os.path.join(
+                        full_path, "config.json"), config_path)
+                    self.log.logger.warning(
+                        f"Plugin [ {plugin} ] Config Generated")
+                self.__reload_module__(
+                    plugin, os.path.join(full_path, "main.py"))
+                self.log.logger.info(
+                    f"Plugin [ {plugin} ] Loaded ( {self.plugins_info[plugin]['version']} )")
+                self.loaded_plugins_list.append(plugin)
+            return self.loaded_plugins_list
+        except Exception as e:
+            self.log.logger.error(f"Error Loading Plugins: {e}")
 
     def reload_load_plugins(self, name):
         if name in self.loaded_plugins_list:
@@ -180,3 +188,32 @@ class Plugin():
         for _, (thread, stop_event) in self.modules.items():
             stop_event.set()
             thread.join(timeout=5)
+
+    def get_load_list(self):
+        preloaded_plugins = []
+        normal_load_order = []
+        unresolved_dependencies = {}
+
+        def add_plugin(plugin_name, is_preload):
+            if plugin_name in preloaded_plugins or plugin_name in normal_load_order:
+                return
+            if plugin_name in unresolved_dependencies:
+                raise Exception(f"Circular dependency detected: {plugin_name}")
+            unresolved_dependencies[plugin_name] = True
+
+            plugin_info = self.plugins_info.get(plugin_name, {})
+            dependencies = plugin_info.get('dependencies', [])
+            for dependency in dependencies:
+                add_plugin(dependency, is_preload)  # 继承父插件的预加载状态
+
+            if is_preload:
+                preloaded_plugins.append(plugin_name)
+            else:
+                normal_load_order.append(plugin_name)
+
+            unresolved_dependencies.pop(plugin_name)
+
+        for plugin, info in self.plugins_info.items():
+            add_plugin(plugin, info.get('preload', False))
+
+        return preloaded_plugins + normal_load_order
