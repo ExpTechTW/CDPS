@@ -75,7 +75,7 @@ class Plugin():
                 plugins_info[plugin] = data
 
     def dependencies():
-        
+        pass
 
     def load_plugins(self, plugins_list):
         loaded_plugins_list = []
