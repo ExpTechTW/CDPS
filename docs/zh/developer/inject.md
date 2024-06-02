@@ -47,7 +47,7 @@ cdps.cdps_server.CDPS.on_start = _new_on_start
 from cdps.plugin.events import Event
 import cdps.cdps_server
 
-class onServerStartEventForExample(Event):
+class onServerStartEventForExampleEvent(Event):
     """ 當 伺服器 啟動 """
     def __init__(self, pid):
         self.pid = pid
@@ -55,7 +55,7 @@ class onServerStartEventForExample(Event):
 original_on_start = cdps.cdps_server.CDPS.on_start
 
 def _new_on_start(self):
-    self.event_manager.call_event(onServerStartEventForExample("example"))
+    self.event_manager.call_event(onServerStartEventForExampleEvent("example"))
     original_on_start(self)
 
 cdps.cdps_server.CDPS.on_start = _new_on_start
