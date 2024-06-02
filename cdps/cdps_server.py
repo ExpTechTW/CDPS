@@ -4,7 +4,7 @@ import sys
 from cdps.config import Config
 from cdps.console.cdps import console_cdps
 from cdps.constants import core_constant
-from cdps.plugin.events import onServerCloseEvent, onServerStartEvent
+from cdps.plugin.events import onServerCloseEvent, onServerStartEvent, onCommandEvent
 from cdps.plugin.manager import Manager, Plugin
 from cdps.state import State
 from cdps.utils.logger import Log
@@ -53,6 +53,7 @@ class CDPS:
         self.event_manager.call_event(onServerCloseEvent(reason))
 
     def run(self):
+        self.loop = True
         try:
             self.event_manager = Manager()
             plugin = Plugin(self.log, self.event_manager)
@@ -64,15 +65,18 @@ class CDPS:
             plugin.load_plugins(self.all_plugins)
             self.on_start()
 
-            while True:
+            while self.loop:
                 command = input()
                 if command != "":
                     args = command.split()
                     if args[0] == "cdps" or args[0] == "CDPS":
-                        console_cdps(args)
+                        console = console_cdps(args)
+                        self.loop = console.loop
+                    else:
+                        self.event_manager.call_event(onCommandEvent(command))
         except KeyboardInterrupt as e:
-            self.on_close(1)
-            plugin.stop_all_modules()
             print("Program was stopped by user")
         finally:
+            self.on_close(1)
+            plugin.stop_all_modules()
             print("Exiting the program...")
