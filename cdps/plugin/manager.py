@@ -74,6 +74,7 @@ class Plugin():
                     shutil.rmtree(full_path_folder)
                 with zipfile.ZipFile(full_path, 'r') as zip_ref:
                     zip_ref.extractall(full_path_folder)
+                os.remove(full_path)
 
     def get_all_plugins(self):
         all_plugins = []
