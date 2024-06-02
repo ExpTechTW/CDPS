@@ -42,19 +42,32 @@ class Manager:
 
 
 class Plugin():
-    def __init__(self, log: Log, event_manager) -> None:
+    _instance = None
+
+    def __new__(cls, log: Log = None, event_manager=None):
+        if not cls._instance:
+            if log is None or event_manager is None:
+                raise ValueError(
+                    "Initial creation of Plugin instance requires 'log' and 'event_manager' parameters")
+            cls._instance = super(Plugin, cls).__new__(cls)
+            cls._instance.init(log, event_manager)
+        return cls._instance
+
+    def init(self, log: Log, event_manager):
         self.log = log
         self.event_manager = event_manager
+        self.loaded_plugins_list = []
+
+        self.modules = {}
 
         for entry in os.listdir(directory_path):
             full_path = os.path.join(directory_path, entry)
-            if os.path.isfile(full_path):
-                if ".cdps" in full_path:
-                    full_path_folder = full_path.replace(".cdps", "")
-                    if os.path.exists(full_path_folder):
-                        shutil.rmtree(full_path_folder)
-                    with zipfile.ZipFile(full_path, 'r') as zip_ref:
-                        zip_ref.extractall(full_path_folder)
+            if os.path.isfile(full_path) and ".cdps" in full_path:
+                full_path_folder = full_path.replace(".cdps", "")
+                if os.path.exists(full_path_folder):
+                    shutil.rmtree(full_path_folder)
+                with zipfile.ZipFile(full_path, 'r') as zip_ref:
+                    zip_ref.extractall(full_path_folder)
 
     def get_all_plugins(self):
         all_plugins = []
@@ -101,7 +114,6 @@ class Plugin():
             plugins_list.remove(plugin)
 
     def load_plugins(self, plugins_list):
-        loaded_plugins_list = []
         for plugin in plugins_list:
             config_path = os.path.join("./config/", "{}.json".format(plugin))
             full_path = os.path.join(directory_path, plugin)
@@ -113,8 +125,23 @@ class Plugin():
                         full_path, "config.json"), config_path)
             self.__reload_module__(plugin, os.path.join(full_path, "main.py"))
             self.log.logger.info("Plugin [ {} ] Loaded".format(plugin))
-            loaded_plugins_list.append(plugin)
-        return loaded_plugins_list
+            self.loaded_plugins_list.append(plugin)
+        return self.loaded_plugins_list
+    
+    def reload_load_plugins(self, name):
+        if name in self.loaded_plugins_list:
+            config_path = os.path.join("./config/", "{}.json".format(name))
+            full_path = os.path.join(directory_path, name)
+            if os.path.isfile(os.path.join(full_path, "config.json")):
+                if not os.path.isfile(config_path):
+                    self.log.logger.warning(
+                        "Plugin [ {} ] Config Generate".format(name))
+                    shutil.copy(os.path.join(
+                        full_path, "config.json"), config_path)
+            self.__reload_module__(name, os.path.join(full_path, "main.py"))
+            self.log.logger.info("Plugin [ {} ] Reloaded".format(name))
+        else:
+            self.log.logger.error("Plugin [ {} ] Reload Failed".format(name))
 
     def __reload_module__(self, module_name, path_to_module):
         spec = importlib.util.spec_from_file_location(
