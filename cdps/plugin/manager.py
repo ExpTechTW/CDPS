@@ -106,7 +106,7 @@ class Plugin():
                 if key == plugin:
                     continue
                 if plugins_info.get(key) is None:
-                    if self.is_pip_package_installed(key):
+                    if self.is_pip_package_installed(key, value.replace(">=", "")):
                         if find_spec(key) is not None:
                             dist = distribution(key)
                             ver_use = Version(dist.version)
@@ -145,10 +145,10 @@ class Plugin():
         for plugin in to_remove:
             plugins_list.remove(plugin)
 
-    def is_pip_package_installed(self, package_name):
+    def is_pip_package_installed(self, package_name, package_ver):
         try:
             subprocess.check_output(
-                [sys.executable, "-m", "pip", "install", package_name],
+                [sys.executable, "-m", "pip", "install", package_name + "==" + package_ver],
                 stderr=subprocess.DEVNULL,
             )
             return True
