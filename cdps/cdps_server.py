@@ -61,7 +61,6 @@ class CDPS:
             plugin.load_info(
                 self.plugins_info, self.all_plugins)
             plugin.dependencies(self.plugins_info, self.all_plugins)
-            plugin.pipdependencies(self.plugins_info, self.all_plugins)
             plugin.load_plugins(self.all_plugins)
             self.on_start()
 

@@ -4,6 +4,7 @@ from importlib.metadata import distribution
 import json
 import os
 import shutil
+import subprocess
 import sys
 import threading
 import zipfile
@@ -104,7 +105,22 @@ class Plugin():
                 if key == plugin:
                     continue
                 if plugins_info.get(key) is None:
-                    if find_spec(key) is None:
+                    if self.is_pip_package_installed(key):
+                        if find_spec(key) is not None:
+                            dist = distribution(key)
+                            ver_use = Version(dist.version)
+                            ver_need = Version(value.replace(">=", ""))
+                            if ver_use < ver_need:
+                                self.log.logger.error(
+                                    "Plugin [ {} ] Need Upgrade pip Dependencies ( {} {} )".format(plugin, key, value))
+                                if plugin not in to_remove:
+                                    to_remove.append(plugin)
+                        else:
+                            self.log.logger.error(
+                                "Plugin [ {} ] Need Install pip Dependencies ( {} {} )".format(plugin, key, value))
+                            if plugin not in to_remove:
+                                to_remove.append(plugin)
+                    else:
                         self.log.logger.error(
                             "Plugin [ {} ] Need Install Dependencies ( {} {} )".format(plugin, key, value))
                         if plugin not in to_remove:
@@ -120,24 +136,15 @@ class Plugin():
         for plugin in to_remove:
             plugins_list.remove(plugin)
 
-    def pipdependencies(self, plugins_info: list, plugins_list: list):
-        to_remove = []
-        for plugin in plugins_list:
-            for key, value in plugins_info[plugin]['dependencies'].items():
-                if key == plugin:
-                    continue
-                if plugins_info.get(key) is None:
-                    if find_spec(key) is not None:
-                        dist = distribution(key)
-                        ver_use = Version(dist.version)
-                        ver_need = Version(value.replace(">=", ""))
-                        if ver_use < ver_need:
-                            self.log.logger.error(
-                                "Plugin [ {} ] Need Upgrade pip Dependencies ( {} {} )".format(plugin, key, value))
-                            if plugin not in to_remove:
-                                to_remove.append(plugin)
-        for plugin in to_remove:
-            plugins_list.remove(plugin)
+    def is_pip_package_installed(self, package_name):
+        try:
+            subprocess.check_output(
+                [sys.executable, "-m", "pip", "install", package_name],
+                stderr=subprocess.DEVNULL,
+            )
+            return True
+        except subprocess.CalledProcessError:
+            return False
 
     def load_plugins(self, plugins_list):
         for plugin in plugins_list:
