@@ -6,3 +6,4 @@ CDPS.egg-info/
 build/
 dev/
 plugins/
+config/

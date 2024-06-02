@@ -4,6 +4,8 @@ import shutil
 import sys
 import zipfile
 
+from cdps.utils.logger import Log
+
 directory_path = "./plugins/"
 
 
@@ -38,7 +40,8 @@ class Manager:
 
 
 class Plugin():
-    def __init__(self, event_manager) -> None:
+    def __init__(self, log: Log, event_manager) -> None:
+        self.log = log
         self.event_manager = event_manager
 
         for entry in os.listdir(directory_path):
@@ -56,15 +59,24 @@ class Plugin():
         for entry in os.listdir(directory_path):
             full_path = os.path.join(directory_path, entry)
             if not "__" in full_path and not os.path.isfile(full_path):
-                if os.path.isfile(os.path.join(full_path, "main.py")):
+                if os.path.isfile(os.path.join(full_path, "main.py")) and os.path.isfile(os.path.join(full_path, "config.json")) and os.path.isfile(os.path.join(full_path, "cdps.json")):
                     all_plugins.append(entry)
-
+                else:
+                    self.log.logger.error(
+                        "Plugin {} Load Failed".format(entry))
         return all_plugins
 
     def load_plugins(self, plugins_list):
         for plugin in plugins_list:
+            config_path = os.path.join("./config/", "{}.json".format(plugin))
             full_path = os.path.join(directory_path, plugin)
+            if not os.path.isfile(config_path):
+                self.log.logger.warning(
+                    "Plugin {} Config Generate".format(plugin))
+                shutil.copy(os.path.join(
+                    full_path, "config.json"), config_path)
             self.reload_module(plugin, os.path.join(full_path, "main.py"))
+            self.log.logger.info("Plugin {} Loaded".format(plugin))
 
     def reload_module(self, module_name, path_to_module):
         spec = importlib.util.spec_from_file_location(
