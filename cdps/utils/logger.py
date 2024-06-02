@@ -48,6 +48,11 @@ class SingletonMeta(type):
             cls._instances[cls] = instance
         return cls._instances[cls]
 
+    @classmethod
+    def reset_instance(cls, instance_cls):
+        if instance_cls in cls._instances:
+            del cls._instances[instance_cls]
+
 
 class Log(metaclass=SingletonMeta):
     def __init__(self, *, url=None):
@@ -60,11 +65,12 @@ class Log(metaclass=SingletonMeta):
         self.plugins_dir = os.path.join(".", "plugins")
         if not os.path.exists(self.plugins_dir):
             os.makedirs(self.plugins_dir)
-        self.logger = self.setup_logger(url=url)
+        self.setup_logger(url=url)
         self.logger.day = 7
 
     def setup_logger(self, *, url):
         logger = logging.getLogger("MyLogger")
+        logger.handlers.clear()
         logger.setLevel("DEBUG")
 
         handler = CustomTimedRotatingFileHandler(
@@ -73,20 +79,18 @@ class Log(metaclass=SingletonMeta):
             interval=1,
             backupCount=5
         )
-
         tz_utc_8 = pytz.timezone('Asia/Taipei')
         formatter = CustomFormatter(
             '[%(asctime)s][%(levelname)s]: %(message)s', '%H:%M:%S', tz_utc_8
         )
         handler.setFormatter(formatter)
-
         logger.addHandler(handler)
 
         console_handler = logging.StreamHandler()
         console_handler.setFormatter(formatter)
         logger.addHandler(console_handler)
 
-        return logger
+        self.logger = logger
 
     def clean_old_logs(self):
         now = time.time()
@@ -95,3 +99,7 @@ class Log(metaclass=SingletonMeta):
             if os.stat(file_path).st_mtime < now - self.logger.day * 86400:
                 print(f"Deleting old log file: {filename}")
                 os.remove(file_path)
+
+    @staticmethod
+    def reset_instance():
+        SingletonMeta.reset_instance(Log)
