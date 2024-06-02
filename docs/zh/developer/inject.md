@@ -60,6 +60,12 @@ def _new_on_start(self):
 
 cdps.cdps_server.CDPS.on_start = _new_on_start
 
+class onServerStartEventForExampleListener(Listener):
+    event = onServerStartEventForExampleEvent
+
+    def on_event(self, event):
+        print(event.pid)
+; :
 event_manager = Manager()
 event_manager.register_listener(onServerStartEventForExampleListener()) # 別忘了監聽事件
 ```
