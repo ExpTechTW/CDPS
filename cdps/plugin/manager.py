@@ -75,12 +75,10 @@ class Plugin():
     def load_info(self, plugins_info, plugins_list):
         for plugin in plugins_list:
             full_path = os.path.join(directory_path, plugin)
-            if os.path.isfile(os.path.join(full_path, "config.json")):
+            if os.path.isfile(os.path.join(full_path, "cdps.json")):
                 with open(os.path.join(full_path, "cdps.json"), 'r', encoding='utf-8') as file:
                     data = json.load(file)
                     plugins_info[plugin] = data
-            else:
-                plugins_info[plugin] = {}
 
     def dependencies(self, plugins_info: list, plugins_list: list):
         for plugin in plugins_list:
@@ -102,11 +100,12 @@ class Plugin():
         for plugin in plugins_list:
             config_path = os.path.join("./config/", "{}.json".format(plugin))
             full_path = os.path.join(directory_path, plugin)
-            if not os.path.isfile(config_path):
-                self.log.logger.warning(
-                    "Plugin {} Config Generate".format(plugin))
-                shutil.copy(os.path.join(
-                    full_path, "config.json"), config_path)
+            if os.path.isfile(os.path.join(full_path, "config.json")):
+                if not os.path.isfile(config_path):
+                    self.log.logger.warning(
+                        "Plugin {} Config Generate".format(plugin))
+                    shutil.copy(os.path.join(
+                        full_path, "config.json"), config_path)
             self.__reload_module__(plugin, os.path.join(full_path, "main.py"))
             self.log.logger.info("Plugin {} Loaded".format(plugin))
             loaded_plugins_list.append(plugin)
