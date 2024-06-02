@@ -191,7 +191,7 @@ class Plugin():
                 module.task(stop_event)
             if self.plugins_info[module_name].get('focus-load', False) and hasattr(module, 'initialize'):
                 module.initialize(completion_event)
-            else:
+            elif completion_event is not None:
                 completion_event.set()
 
         thread = threading.Thread(target=load_and_run_module)
