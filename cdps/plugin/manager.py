@@ -87,6 +87,8 @@ class Plugin():
                 if plugins_info.get(key) is None:
                     self.log.logger.error(
                         "Plugin [ {} ] Need Install Dependencies ( {} {} )".format(plugin, key, value))
+                    if plugin not in to_remove:
+                        to_remove.append(plugin)
                 else:
                     ver_use = Version(plugins_info[key]['version'])
                     ver_need = Version(value.replace(">=", ""))
