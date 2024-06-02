@@ -81,6 +81,7 @@ class Plugin():
                     plugins_info[plugin] = data
 
     def dependencies(self, plugins_info: list, plugins_list: list):
+        to_remove = []
         for plugin in plugins_list:
             for key, value in plugins_info[plugin]['dependencies'].items():
                 if plugins_info[key] is None:
@@ -89,11 +90,13 @@ class Plugin():
                 else:
                     ver_use = Version(plugins_info[key]['version'])
                     ver_need = Version(value.replace(">=", ""))
-
                     if ver_use < ver_need:
                         self.log.logger.error(
                             "Plugin {} Need Upgrade Dependencies {} {}".format(plugin, key, value))
-                        plugins_list.remove(plugin)
+                        if plugin not in to_remove:
+                            to_remove.append(plugin)
+        for plugin in to_remove:
+            plugins_list.remove(plugin)
 
     def load_plugins(self, plugins_list):
         loaded_plugins_list = []
