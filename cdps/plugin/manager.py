@@ -61,11 +61,19 @@ class Plugin():
         for entry in os.listdir(directory_path):
             full_path = os.path.join(directory_path, entry)
             if not "__" in full_path and not os.path.isfile(full_path):
-                if os.path.isfile(os.path.join(full_path, "main.py")) and os.path.isfile(os.path.join(full_path, "config.json")) and os.path.isfile(os.path.join(full_path, "cdps.json")):
-                    all_plugins.append(entry)
+                if os.path.isfile(os.path.join(full_path, "main.py")):
+                    if os.path.isfile(os.path.join(full_path, "config.json")):
+                        if os.path.isfile(os.path.join(full_path, "cdps.json")):
+                            all_plugins.append(entry)
+                        else:
+                            self.log.logger.error(
+                                "Plugin {} Load Failed (cdps.json)".format(entry))
+                    else:
+                        self.log.logger.error(
+                            "Plugin {} Load Failed (config.json)".format(entry))
                 else:
                     self.log.logger.error(
-                        "Plugin {} Load Failed".format(entry))
+                        "Plugin {} Load Failed (main.py)".format(entry))
         return all_plugins
 
     def load_info(self, plugins_info, plugins_list):
