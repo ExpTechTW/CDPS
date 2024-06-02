@@ -35,5 +35,3 @@ class console_cdps():
                 self.log.logger.error("Unknow Command! ( cdps plugin )")
         else:
             self.log.logger.error("Unknow Command! ( cdps plugin )")
-
-# cdps plugin reload example
