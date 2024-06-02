@@ -102,10 +102,11 @@ class Plugin():
                 if key == plugin:
                     continue
                 if plugins_info.get(key) is None:
-                    self.log.logger.error(
-                        "Plugin [ {} ] Need Install Dependencies ( {} {} )".format(plugin, key, value))
-                    if plugin not in to_remove:
-                        to_remove.append(plugin)
+                    if find_spec(key) is None:
+                        self.log.logger.error(
+                            "Plugin [ {} ] Need Install Dependencies ( {} {} )".format(plugin, key, value))
+                        if plugin not in to_remove:
+                            to_remove.append(plugin)
                 else:
                     ver_use = Version(plugins_info[key]['version'])
                     ver_need = Version(value.replace(">=", ""))
@@ -126,17 +127,16 @@ class Plugin():
                 if plugins_info.get(key) is None:
                     if find_spec(key) is None:
                         self.log.logger.error(
-                            "Plugin [ {} ] Need Install Dependencies ( {} {} )".format(plugin, key, value))
+                            "Plugin [ {} ] Need Install pip Dependencies ( {} {} )".format(plugin, key, value))
                         if plugin not in to_remove:
                             to_remove.append(plugin)
                     else:
-                        print(key)
                         dist = distribution(key)
                         ver_use = Version(dist.version)
                         ver_need = Version(value.replace(">=", ""))
                         if ver_use < ver_need:
                             self.log.logger.error(
-                                "Plugin [ {} ] Need Upgrade Dependencies ( {} {} )".format(plugin, key, value))
+                                "Plugin [ {} ] Need Upgrade pip Dependencies ( {} {} )".format(plugin, key, value))
                             if plugin not in to_remove:
                                 to_remove.append(plugin)
         for plugin in to_remove:
