@@ -116,19 +116,16 @@ class Plugin():
                                     "Plugin [ {} ] Need Upgrade pip Dependencies ( {} {} )".format(plugin, key, value))
                                 if plugin not in to_remove:
                                     to_remove.append(plugin)
-                                del self.plugins_info[plugin]
                         else:
                             self.log.logger.error(
                                 "Plugin [ {} ] Need Install pip Dependencies ( {} {} )".format(plugin, key, value))
                             if plugin not in to_remove:
                                 to_remove.append(plugin)
-                            del self.plugins_info[plugin]
                     else:
                         self.log.logger.error(
                             "Plugin [ {} ] Need Install Dependencies ( {} {} )".format(plugin, key, value))
                         if plugin not in to_remove:
                             to_remove.append(plugin)
-                        del self.plugins_info[plugin]
                 else:
                     ver_use = Version(plugins_info[key]['version'])
                     ver_need = Version(value.replace(">=", ""))
