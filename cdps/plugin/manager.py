@@ -1,5 +1,4 @@
 import importlib
-from importlib.metadata import distribution
 import json
 import os
 import shutil
