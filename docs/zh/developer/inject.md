@@ -65,7 +65,7 @@ class onServerStartEventForExampleListener(Listener):
 
     def on_event(self, event):
         print(event.pid)
-; :
+
 event_manager = Manager()
 event_manager.register_listener(onServerStartEventForExampleListener()) # 別忘了監聽事件
 ```
