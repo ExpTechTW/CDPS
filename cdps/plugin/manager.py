@@ -1,8 +1,10 @@
 import importlib
+from importlib.metadata import distribution
 import json
 import os
 import shutil
 import sys
+import threading
 import zipfile
 
 from cdps.utils.logger import Log
@@ -42,34 +44,46 @@ class Manager:
 
 
 class Plugin():
-    def __init__(self, log: Log, event_manager) -> None:
+    _instance = None
+
+    def __new__(cls, log=None, event_manager=None):
+        if not cls._instance:
+            if log is None or event_manager is None:
+                raise ValueError(
+                    "Initial creation of Plugin instance requires 'log' and 'event_manager' parameters")
+            cls._instance = super(Plugin, cls).__new__(cls)
+            cls._instance.init(log, event_manager)
+        return cls._instance
+
+    def init(self, log: Log, event_manager):
         self.log = log
         self.event_manager = event_manager
+        self.modules = {}
+        self.all_stopped = threading.Event()
+        self.lock = threading.Lock()
+        self.loaded_plugins_list = []
+        self._load_initial_plugins()
 
+    def _load_initial_plugins(self):
         for entry in os.listdir(directory_path):
             full_path = os.path.join(directory_path, entry)
-            if os.path.isfile(full_path):
-                if ".cdps" in full_path:
-                    full_path_folder = full_path.replace(".cdps", "")
-                    if os.path.exists(full_path_folder):
-                        shutil.rmtree(full_path_folder)
-                    with zipfile.ZipFile(full_path, 'r') as zip_ref:
-                        zip_ref.extractall(full_path_folder)
+            if os.path.isfile(full_path) and ".cdps" in full_path:
+                full_path_folder = full_path.replace(".cdps", "")
+                if os.path.exists(full_path_folder):
+                    shutil.rmtree(full_path_folder)
+                with zipfile.ZipFile(full_path, 'r') as zip_ref:
+                    zip_ref.extractall(full_path_folder)
 
     def get_all_plugins(self):
         all_plugins = []
         for entry in os.listdir(directory_path):
             full_path = os.path.join(directory_path, entry)
             if not "__" in full_path and not os.path.isfile(full_path):
-                if os.path.isfile(os.path.join(full_path, "main.py")):
-                    if os.path.isfile(os.path.join(full_path, "cdps.json")):
-                        all_plugins.append(entry)
-                    else:
-                        self.log.logger.error(
-                            "Plugin {} Load Failed (cdps.json)".format(entry))
+                if os.path.isfile(os.path.join(full_path, "main.py")) and os.path.isfile(os.path.join(full_path, "cdps.json")):
+                    all_plugins.append(entry)
                 else:
                     self.log.logger.error(
-                        "Plugin {} Load Failed (main.py)".format(entry))
+                        f"Plugin [ {entry} ] Load Failed (missing main.py or cdps.json)")
         return all_plugins
 
     def load_info(self, plugins_info, plugins_list):
@@ -81,39 +95,92 @@ class Plugin():
                     plugins_info[plugin] = data
 
     def dependencies(self, plugins_info: list, plugins_list: list):
+        to_remove = []
         for plugin in plugins_list:
             for key, value in plugins_info[plugin]['dependencies'].items():
-                if plugins_info[key] is None:
-                    self.log.logger.error(
-                        "Plugin {} Need Install Dependencies {} {}".format(plugin, key, value))
+                if plugins_info.get(key) is None:
+                    if importlib.util.find_spec(key) is None:
+                        self.log.logger.error(
+                            "Plugin [ {} ] Need Install Dependencies ( {} {} )".format(plugin, key, value))
+                        if plugin not in to_remove:
+                            to_remove.append(plugin)
+                    else:
+                        dist = distribution(key)
+                        ver_use = Version(dist.version)
+                        ver_need = Version(value.replace(">=", ""))
+                        if ver_use < ver_need:
+                            self.log.logger.error(
+                                "Plugin [ {} ] Need Upgrade Dependencies ( {} {} )".format(plugin, key, value))
+                            if plugin not in to_remove:
+                                to_remove.append(plugin)
                 else:
                     ver_use = Version(plugins_info[key]['version'])
                     ver_need = Version(value.replace(">=", ""))
-
                     if ver_use < ver_need:
                         self.log.logger.error(
-                            "Plugin {} Need Upgrade Dependencies {} {}".format(plugin, key, value))
-                        plugins_list.remove(plugin)
+                            "Plugin [ {} ] Need Upgrade Dependencies ( {} {} )".format(plugin, key, value))
+                        if plugin not in to_remove:
+                            to_remove.append(plugin)
+        for plugin in to_remove:
+            plugins_list.remove(plugin)
 
     def load_plugins(self, plugins_list):
-        loaded_plugins_list = []
         for plugin in plugins_list:
-            config_path = os.path.join("./config/", "{}.json".format(plugin))
+            config_path = os.path.join("./config/", f"{plugin}.json")
             full_path = os.path.join(directory_path, plugin)
+            if os.path.isfile(os.path.join(full_path, "config.json")) and not os.path.isfile(config_path):
+                shutil.copy(os.path.join(
+                    full_path, "config.json"), config_path)
+                self.log.logger.warning(
+                    f"Plugin [ {plugin} ] Config Generated")
+            self.__reload_module__(plugin, os.path.join(full_path, "main.py"))
+            self.log.logger.info(f"Plugin [ {plugin} ] Loaded")
+            self.loaded_plugins_list.append(plugin)
+        return self.loaded_plugins_list
+
+    def reload_load_plugins(self, name):
+        if name in self.loaded_plugins_list:
+            config_path = os.path.join("./config/", "{}.json".format(name))
+            full_path = os.path.join(directory_path, name)
             if os.path.isfile(os.path.join(full_path, "config.json")):
                 if not os.path.isfile(config_path):
                     self.log.logger.warning(
-                        "Plugin {} Config Generate".format(plugin))
+                        "Plugin [ {} ] Config Generate".format(name))
                     shutil.copy(os.path.join(
                         full_path, "config.json"), config_path)
-            self.__reload_module__(plugin, os.path.join(full_path, "main.py"))
-            self.log.logger.info("Plugin {} Loaded".format(plugin))
-            loaded_plugins_list.append(plugin)
-        return loaded_plugins_list
+            self.__reload_module__(name, os.path.join(full_path, "main.py"))
+            self.log.logger.info("Plugin [ {} ] Reloaded".format(name))
+        else:
+            self.log.logger.error("Plugin [ {} ] Reload Failed".format(name))
 
     def __reload_module__(self, module_name, path_to_module):
-        spec = importlib.util.spec_from_file_location(
-            module_name, path_to_module)
-        module = importlib.util.module_from_spec(spec)
-        sys.modules[module_name] = module
-        spec.loader.exec_module(module)
+        if module_name in self.modules:
+            self.stop_module(module_name)
+
+        stop_event = threading.Event()
+
+        def load_and_run_module():
+            spec = importlib.util.spec_from_file_location(
+                module_name, path_to_module)
+            module = importlib.util.module_from_spec(spec)
+            sys.modules[module_name] = module
+            spec.loader.exec_module(module)
+            if hasattr(module, 'task'):
+                module.task(stop_event)
+        thread = threading.Thread(target=load_and_run_module)
+        thread.daemon = True
+        thread.start()
+        self.modules[module_name] = (thread, stop_event)
+
+    def stop_module(self, module_name):
+        if module_name in self.modules:
+            thread, stop_event = self.modules[module_name]
+            stop_event.set()
+            thread.join(timeout=5)
+            self.log.logger.warning(
+                "Plugin [ {} ] Unloaded".format(module_name))
+
+    def stop_all_modules(self):
+        for _, (thread, stop_event) in self.modules.items():
+            stop_event.set()
+            thread.join(timeout=5)

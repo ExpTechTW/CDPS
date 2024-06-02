@@ -1,7 +1,8 @@
+import os
 import sys
-import time
 
 from cdps.config import Config
+from cdps.console.cdps import console_cdps
 from cdps.constants import core_constant
 from cdps.plugin.events import onServerCloseEvent, onServerStartEvent
 from cdps.plugin.manager import Manager, Plugin
@@ -46,7 +47,10 @@ class CDPS:
             return False
 
     def on_start(self):
-        self.event_manager.call_event(onServerStartEvent("start"))
+        self.event_manager.call_event(onServerStartEvent(os.getpid()))
+
+    def on_close(self, reason):
+        self.event_manager.call_event(onServerCloseEvent(reason))
 
     def run(self):
         try:
@@ -58,13 +62,17 @@ class CDPS:
                 self.plugins_info, self.all_plugins)
             plugin.dependencies(self.plugins_info, self.all_plugins)
             plugin.load_plugins(self.all_plugins)
+            self.on_start()
 
             while True:
-                self.on_start()
-                time.sleep(1)
-
-            # self.event_manager.call_event(onServerCloseEvent("close"))
-        except KeyboardInterrupt:
+                command = input()
+                if command != "":
+                    args = command.split()
+                    if args[0] == "cdps" or args[0] == "CDPS":
+                        console_cdps(args)
+        except KeyboardInterrupt as e:
+            self.on_close(1)
+            plugin.stop_all_modules()
             print("Program was stopped by user")
         finally:
             print("Exiting the program...")
