@@ -1,9 +1,6 @@
-"""
-Misc tool collection
-"""
 import inspect
 import threading
-from typing import Any, Callable, Iterable, List, Optional, Tuple, TypeVar
+from typing import Callable, Iterable, List, Optional, Tuple, TypeVar
 
 
 def start_thread(func: Callable, args: Tuple, name: Optional[str] = None):
@@ -28,18 +25,7 @@ def deep_copy_dict(source: dict) -> dict:
     return ret
 
 
-def print_text_to_console(logger, text: Any):
-    from mcdreforged.minecraft.rtext.text import RTextBase
-    for line in RTextBase.from_any(text).to_colored_text().splitlines():
-        logger.info(line)
-
-
 def copy_signature(target: Callable, origin: Callable) -> Callable:
-    """
-    Copy the function signature of origin into target
-    """
     assert callable(target) and callable(origin)
-
-    # https://stackoverflow.com/questions/39926567/python-create-decorator-preserving-function-arguments
     target.__signature__ = inspect.signature(origin)
     return target
