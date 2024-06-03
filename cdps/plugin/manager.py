@@ -2,6 +2,7 @@ import importlib
 import json
 import os
 import shutil
+import subprocess
 import sys
 import threading
 import zipfile
@@ -115,6 +116,8 @@ class Plugin():
     def dependencies(self, plugins_info: list, plugins_list: list):
         to_remove = []
         for plugin in plugins_list:
+            if not 'dependencies' in plugins_info[plugin]:
+                continue
             for key, value in plugins_info[plugin]['dependencies'].items():
                 if key == plugin:
                     continue
@@ -123,7 +126,8 @@ class Plugin():
                         "Plugin [ {} ] Need Install Dependencies ( {} {} )".format(plugin, key, value))
                     if plugin not in to_remove:
                         to_remove.append(plugin)
-                    del self.plugins_info[plugin]
+                    if plugins_info.get(plugin) is not None:
+                        del self.plugins_info[plugin]
                 else:
                     ver_use = Version(plugins_info[key]['version'])
                     ver_need = Version(value.replace(">=", ""))
@@ -132,13 +136,56 @@ class Plugin():
                             "Plugin [ {} ] Need Upgrade Dependencies ( {} {} )".format(plugin, key, value))
                         if plugin not in to_remove:
                             to_remove.append(plugin)
+                        if plugins_info.get(plugin) is not None:
+                            del self.plugins_info[plugin]
+        for plugin in to_remove:
+            plugins_list.remove(plugin)
+
+    def pip_dependencies(self, plugins_info: list, plugins_list: list):
+        to_remove = []
+        for plugin in plugins_list:
+            if not 'pip_dependencies' in plugins_info[plugin]:
+                continue
+            for key, value in plugins_info[plugin]['pip_dependencies'].items():
+                package_ver = self.check_package_installed(key)
+                if package_ver is not None:
+                    ver_use = Version(package_ver)
+                    ver_need = Version(value.replace(">=", ""))
+                    if ver_use < ver_need:
+                        self.log.logger.error(
+                            "Plugin [ {} ] Need Upgrade pip Dependencies ( {} {} )".format(plugin, key, value))
+                        if plugin not in to_remove:
+                            to_remove.append(plugin)
+                        if plugins_info.get(plugin) is not None:
+                            del self.plugins_info[plugin]
+                else:
+                    self.log.logger.error(
+                        "Plugin [ {} ] Need Install pip Dependencies ( {} {} )".format(plugin, key, value))
+                    if plugin not in to_remove:
+                        to_remove.append(plugin)
+                    if plugins_info.get(plugin) is not None:
                         del self.plugins_info[plugin]
         for plugin in to_remove:
             plugins_list.remove(plugin)
 
+    def check_package_installed(self, package_name):
+        try:
+            result = subprocess.run(
+                [sys.executable, "-m", "pip", "show", package_name],
+                text=True,
+                capture_output=True,
+                check=True
+            )
+            for line in result.stdout.splitlines():
+                if line.startswith("Version:"):
+                    return line.split()[1]
+            return None
+        except subprocess.CalledProcessError:
+            return None
+
     def load_plugins(self, plugins_list):
         try:
-            plugin_load_list = self.get_load_list()
+            plugin_load_list = self.get_load_list(plugins_list)
             plugin_load_list.remove("cdps")
             for plugin in plugin_load_list:
                 config_path = os.path.join("./config/", f"{plugin}.json")
@@ -187,8 +234,8 @@ class Plugin():
             module = importlib.util.module_from_spec(spec)
             sys.modules[module_name] = module
             spec.loader.exec_module(module)
-            if hasattr(module, 'task'):
-                module.task(stop_event)
+            if hasattr(module, 'task_run'):
+                module.task_run(stop_event)
             if self.plugins_info[module_name].get('focus-load', False) and hasattr(module, 'initialize'):
                 module.initialize(completion_event)
             elif completion_event is not None:
@@ -212,7 +259,7 @@ class Plugin():
             stop_event.set()
             thread.join(timeout=5)
 
-    def get_load_list(self):
+    def get_load_list(self, plugins_list):
         preloaded_plugins = []
         normal_load_order = []
         unresolved_dependencies = {}
@@ -227,7 +274,9 @@ class Plugin():
             plugin_info = self.plugins_info.get(plugin_name, {})
             dependencies = plugin_info.get('dependencies', [])
             for dependency in dependencies:
-                add_plugin(dependency, is_preload)  # 继承父插件的预加载状态
+                for plugin in plugins_list:
+                    if dependency == plugin:
+                        add_plugin(dependency, is_preload)
 
             if is_preload:
                 preloaded_plugins.append(plugin_name)

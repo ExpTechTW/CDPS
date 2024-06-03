@@ -4,7 +4,7 @@ Core contants
 
 NAME = 'CDPS'
 PACKAGE_NAME = 'cdps'
-VERSION = '1.0.17'
+VERSION = '1.0.18'
 
 CLI_COMMAND = PACKAGE_NAME
 
