@@ -1,6 +1,6 @@
 import os
-import zipfile
 import shutil
+import zipfile
 
 
 def pack(args, quiet):

@@ -1,6 +1,6 @@
+from cdps.constants import core_constant
 from cdps.plugin.manager import Plugin
 from cdps.utils.logger import Log
-from cdps.constants import core_constant
 
 
 class console_cdps():
