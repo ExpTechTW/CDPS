@@ -80,6 +80,8 @@ class Plugin():
         self.lock = threading.Lock()
         self.loaded_plugins_list = []
         self._load_initial_plugins()
+        self.all_plugins = []
+        self.plugins_info = {}
 
     def _load_initial_plugins(self):
         for entry in os.listdir(directory_path):
@@ -93,60 +95,58 @@ class Plugin():
                 os.remove(full_path)
 
     def get_all_plugins(self):
-        all_plugins = []
         for entry in os.listdir(directory_path):
             full_path = os.path.join(directory_path, entry)
             if not "__" in full_path and not os.path.isfile(full_path):
                 if os.path.isfile(os.path.join(full_path, "main.py")) and os.path.isfile(os.path.join(full_path, "cdps.json")):
-                    all_plugins.append(entry)
+                    self.all_plugins.append(entry)
                 else:
                     self.log.logger.error(
                         f"Plugin [ {entry} ] Load Failed (missing main.py or cdps.json)")
-        return all_plugins
 
-    def load_info(self, plugins_info, plugins_list):
+    def load_info(self, plugins_info):
         self.plugins_info = plugins_info
-        for plugin in plugins_list:
+        for plugin in self.all_plugins:
             full_path = os.path.join(directory_path, plugin)
             if os.path.isfile(os.path.join(full_path, "cdps.json")):
                 with open(os.path.join(full_path, "cdps.json"), 'r', encoding='utf-8') as file:
                     data = json.load(file)
-                    plugins_info[plugin] = data
+                    self.plugins_info[plugin] = data
 
-    def dependencies(self, plugins_info: list, plugins_list: list):
+    def dependencies(self):
         to_remove = []
-        for plugin in plugins_list:
-            if not 'dependencies' in plugins_info[plugin]:
+        for plugin in self.all_plugins:
+            if not 'dependencies' in self.plugins_info[plugin]:
                 continue
-            for key, value in plugins_info[plugin]['dependencies'].items():
+            for key, value in self.plugins_info[plugin]['dependencies'].items():
                 if key == plugin:
                     continue
-                if plugins_info.get(key) is None:
+                if self.plugins_info.get(key) is None:
                     self.log.logger.error(
                         "Plugin [ {} ] Need Install Dependencies ( {} {} )".format(plugin, key, value))
                     if plugin not in to_remove:
                         to_remove.append(plugin)
-                    if plugins_info.get(plugin) is not None:
+                    if self.plugins_info.get(plugin) is not None:
                         del self.plugins_info[plugin]
                 else:
-                    ver_use = Version(plugins_info[key]['version'])
+                    ver_use = Version(self.plugins_info[key]['version'])
                     ver_need = Version(value.replace(">=", ""))
                     if ver_use < ver_need:
                         self.log.logger.error(
                             "Plugin [ {} ] Need Upgrade Dependencies ( {} {} )".format(plugin, key, value))
                         if plugin not in to_remove:
                             to_remove.append(plugin)
-                        if plugins_info.get(plugin) is not None:
-                            del self.plugins_info[plugin]
+                        if self.plugins_info.get(plugin) is not None:
+                            del self.self.plugins_info[plugin]
         for plugin in to_remove:
-            plugins_list.remove(plugin)
+            self.all_plugins.remove(plugin)
 
-    def pip_dependencies(self, plugins_info: list, plugins_list: list):
+    def pip_dependencies(self):
         to_remove = []
-        for plugin in plugins_list:
-            if not 'pip_dependencies' in plugins_info[plugin]:
+        for plugin in self.all_plugins:
+            if not 'pip_dependencies' in self.plugins_info[plugin]:
                 continue
-            for key, value in plugins_info[plugin]['pip_dependencies'].items():
+            for key, value in self.plugins_info[plugin]['pip_dependencies'].items():
                 package_ver = self.check_package_installed(key)
                 if package_ver is not None:
                     ver_use = Version(package_ver)
@@ -156,17 +156,17 @@ class Plugin():
                             "Plugin [ {} ] Need Upgrade pip Dependencies ( {} {} )".format(plugin, key, value))
                         if plugin not in to_remove:
                             to_remove.append(plugin)
-                        if plugins_info.get(plugin) is not None:
+                        if self.plugins_info.get(plugin) is not None:
                             del self.plugins_info[plugin]
                 else:
                     self.log.logger.error(
                         "Plugin [ {} ] Need Install pip Dependencies ( {} {} )".format(plugin, key, value))
                     if plugin not in to_remove:
                         to_remove.append(plugin)
-                    if plugins_info.get(plugin) is not None:
+                    if self.plugins_info.get(plugin) is not None:
                         del self.plugins_info[plugin]
         for plugin in to_remove:
-            plugins_list.remove(plugin)
+            self.all_plugins.remove(plugin)
 
     def check_package_installed(self, package_name):
         try:
