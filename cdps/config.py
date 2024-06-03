@@ -8,9 +8,19 @@ from cdps.utils.yaml_data_storage import YamlDataStorage
 CONFIG_FILE = 'config.yml'
 DEFAULT_CONFIG_RESOURCE_PATH = '/resources/default_config.yml'
 
+
 class Config(YamlDataStorage):
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(Config, cls).__new__(cls)
+        return cls._instance
+
     def __init__(self):
-        super().__init__(CONFIG_FILE, DEFAULT_CONFIG_RESOURCE_PATH)
+        if not hasattr(self, '_initialized'):
+            super().__init__(CONFIG_FILE, DEFAULT_CONFIG_RESOURCE_PATH)
+            self._initialized = True
 
     def set_values(self, changes: Dict[Union[Tuple[str], str], Any]):
         with self._data_operation_lock:

@@ -20,9 +20,6 @@ class CustomTimedRotatingFileHandler(TimedRotatingFileHandler):
         return os.path.join(self.dir_name, time.strftime("%Y-%m-%d") + ".log")
 
     def doRollover(self):
-        """
-        doRollover is called whenever the logging time interval has been reached.
-        """
         self.stream.close()
         self.baseFilename = self.get_filename()
         self.mode = 'a'
@@ -67,7 +64,6 @@ class Log(metaclass=SingletonMeta):
         if not os.path.exists(self.plugins_dir):
             os.makedirs(self.plugins_dir)
         self.setup_logger(url=url)
-        self.logger.day = 7
 
     def setup_logger(self, *, url):
         logger = logging.getLogger("MyLogger")

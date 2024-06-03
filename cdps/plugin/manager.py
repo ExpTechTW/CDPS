@@ -183,9 +183,9 @@ class Plugin():
         except subprocess.CalledProcessError:
             return None
 
-    def load_plugins(self, plugins_list):
+    def load_plugins(self):
         try:
-            plugin_load_list = self.get_load_list(plugins_list)
+            plugin_load_list = self.get_load_list()
             plugin_load_list.remove("cdps")
             for plugin in plugin_load_list:
                 config_path = os.path.join("./config/", f"{plugin}.json")
@@ -259,7 +259,7 @@ class Plugin():
             stop_event.set()
             thread.join(timeout=5)
 
-    def get_load_list(self, plugins_list):
+    def get_load_list(self):
         preloaded_plugins = []
         normal_load_order = []
         unresolved_dependencies = {}
