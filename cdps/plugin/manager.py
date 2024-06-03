@@ -3,6 +3,7 @@ import json
 import os
 import shutil
 import subprocess
+import subprocess
 import sys
 import threading
 import zipfile
@@ -274,9 +275,7 @@ class Plugin():
             plugin_info = self.plugins_info.get(plugin_name, {})
             dependencies = plugin_info.get('dependencies', [])
             for dependency in dependencies:
-                for plugin in plugins_list:
-                    if dependency == plugin:
-                        add_plugin(dependency, is_preload)
+                add_plugin(dependency, is_preload)  # 继承父插件的预加载状态
 
             if is_preload:
                 preloaded_plugins.append(plugin_name)
