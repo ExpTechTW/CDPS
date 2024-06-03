@@ -32,7 +32,7 @@ def task_run(stop_event):
 
 ### new_thread
 ```py
-import threading
+from cdps.plugin.thread import new_thread
 import time
 
 @new_thread
