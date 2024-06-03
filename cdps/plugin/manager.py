@@ -1,6 +1,4 @@
 import importlib
-from importlib.util import find_spec
-from importlib.metadata import distribution
 import json
 import os
 import shutil
@@ -118,28 +116,18 @@ class Plugin():
     def dependencies(self, plugins_info: list, plugins_list: list):
         to_remove = []
         for plugin in plugins_list:
+            if not 'dependencies' in plugins_info[plugin]:
+                continue
             for key, value in plugins_info[plugin]['dependencies'].items():
                 if key == plugin:
                     continue
                 if plugins_info.get(key) is None:
-                    if self.is_pip_package_installed(key, value.replace(">=", "")):
-                        dist = distribution(key)
-                        ver_use = Version(dist.version)
-                        ver_need = Version(value.replace(">=", ""))
-                        if ver_use < ver_need:
-                            self.log.logger.error(
-                                "Plugin [ {} ] Need Upgrade pip Dependencies ( {} {} )".format(plugin, key, value))
-                            if plugin not in to_remove:
-                                to_remove.append(plugin)
-                            if plugins_info.get(plugin) is not None:
-                                del self.plugins_info[plugin]
-                    else:
-                        self.log.logger.error(
-                            "Plugin [ {} ] Need Install Dependencies ( {} {} )".format(plugin, key, value))
-                        if plugin not in to_remove:
-                            to_remove.append(plugin)
-                        if plugins_info.get(plugin) is not None:
-                            del self.plugins_info[plugin]
+                    self.log.logger.error(
+                        "Plugin [ {} ] Need Install Dependencies ( {} {} )".format(plugin, key, value))
+                    if plugin not in to_remove:
+                        to_remove.append(plugin)
+                    if plugins_info.get(plugin) is not None:
+                        del self.plugins_info[plugin]
                 else:
                     ver_use = Version(plugins_info[key]['version'])
                     ver_need = Version(value.replace(">=", ""))
@@ -153,15 +141,47 @@ class Plugin():
         for plugin in to_remove:
             plugins_list.remove(plugin)
 
-    def is_pip_package_installed(self, package_name, package_ver):
+    def pip_dependencies(self, plugins_info: list, plugins_list: list):
+        to_remove = []
+        for plugin in plugins_list:
+            if not 'pip_dependencies' in plugins_info[plugin]:
+                continue
+            for key, value in plugins_info[plugin]['pip_dependencies'].items():
+                package_ver = self.check_package_installed(key)
+                if package_ver is not None:
+                    ver_use = Version(package_ver)
+                    ver_need = Version(value.replace(">=", ""))
+                    if ver_use < ver_need:
+                        self.log.logger.error(
+                            "Plugin [ {} ] Need Upgrade pip Dependencies ( {} {} )".format(plugin, key, value))
+                        if plugin not in to_remove:
+                            to_remove.append(plugin)
+                        if plugins_info.get(plugin) is not None:
+                            del self.plugins_info[plugin]
+                else:
+                    self.log.logger.error(
+                        "Plugin [ {} ] Need Install pip Dependencies ( {} {} )".format(plugin, key, value))
+                    if plugin not in to_remove:
+                        to_remove.append(plugin)
+                    if plugins_info.get(plugin) is not None:
+                        del self.plugins_info[plugin]
+        for plugin in to_remove:
+            plugins_list.remove(plugin)
+
+    def check_package_installed(self, package_name):
         try:
-            subprocess.check_output(
-                [sys.executable, "-m", "pip", "install", package_name + "==" + package_ver],
-                stderr=subprocess.DEVNULL,
+            result = subprocess.run(
+                [sys.executable, "-m", "pip", "show", package_name],
+                text=True,
+                capture_output=True,
+                check=True
             )
-            return True
+            for line in result.stdout.splitlines():
+                if line.startswith("Version:"):
+                    return line.split()[1]
+            return None
         except subprocess.CalledProcessError:
-            return False
+            return None
 
     def load_plugins(self, plugins_list):
         try:
