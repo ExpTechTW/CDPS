@@ -1,5 +1,6 @@
 ## 1.0.15
 ### 🌟 新增
+- 事件 裝飾器
 - `onCommandEvent`
 - `cdps version` ( In Program Command )
 - `cdps exit` ( In Program Command )

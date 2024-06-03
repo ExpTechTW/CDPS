@@ -20,6 +20,21 @@ class Listener:
         raise NotImplementedError("You must implement the on_event method.")
 
 
+def event_listener(event_type):
+    def decorator(listener_class):
+        if not hasattr(listener_class, 'on_event'):
+            raise ValueError(
+                f"Class {listener_class.__name__} must have an 'on_event' method.")
+        setattr(listener_class, 'event', event_type)
+        manager = Manager._instance
+        if manager is None:
+            manager = Manager()
+        manager.register_listener(listener_class())
+
+        return listener_class
+    return decorator
+
+
 class Manager:
     _instance = None
 
@@ -30,10 +45,11 @@ class Manager:
         return cls._instance
 
     def register_listener(self, listener):
-        if listener.event is None:
+        event_type = getattr(listener, 'event', None)
+        if event_type is None:
             raise ValueError(
-                "Listener must have an 'event_type' attribute defined.")
-        event_type = listener.event
+                "Listener must have an 'event' attribute defined.")
+
         if event_type not in self.listeners:
             self.listeners[event_type] = []
         self.listeners[event_type].append(listener)
@@ -210,7 +226,7 @@ class Plugin():
                 module.task(stop_event)
             if self.plugins_info[module_name].get('focus-load', False) and hasattr(module, 'initialize'):
                 module.initialize(completion_event)
-            else:
+            elif completion_event is not None:
                 completion_event.set()
 
         thread = threading.Thread(target=load_and_run_module)
