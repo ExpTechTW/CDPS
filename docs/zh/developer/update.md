@@ -9,8 +9,8 @@
 
 - Config 類不是 單例類 的問題
 - Log `__init__` 覆蓋天數的問題
-  > [!WARNING]
-  > plugin 內的 `task` 現在改為 `task_run` [參考這裡](https://github.com/ExpTechTW/CDPS/blob/master/docs/zh/developer/thread.md#task_run)
+> [!WARNING]
+> plugin 內的 `task` 現在改為 `task_run` [參考這裡](https://github.com/ExpTechTW/CDPS/blob/master/docs/zh/developer/thread.md#task_run)
 
 # 1.0.17 (hotfix)
 
