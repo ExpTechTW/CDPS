@@ -123,20 +123,12 @@ class Plugin():
                     continue
                 if plugins_info.get(key) is None:
                     if self.is_pip_package_installed(key, value.replace(">=", "")):
-                        if find_spec(key) is not None:
-                            dist = distribution(key)
-                            ver_use = Version(dist.version)
-                            ver_need = Version(value.replace(">=", ""))
-                            if ver_use < ver_need:
-                                self.log.logger.error(
-                                    "Plugin [ {} ] Need Upgrade pip Dependencies ( {} {} )".format(plugin, key, value))
-                                if plugin not in to_remove:
-                                    to_remove.append(plugin)
-                                if plugins_info.get(plugin) is not None:
-                                    del self.plugins_info[plugin]
-                        else:
+                        dist = distribution(key)
+                        ver_use = Version(dist.version)
+                        ver_need = Version(value.replace(">=", ""))
+                        if ver_use < ver_need:
                             self.log.logger.error(
-                                "Plugin [ {} ] Need Install pip Dependencies ( {} {} )".format(plugin, key, value))
+                                "Plugin [ {} ] Need Upgrade pip Dependencies ( {} {} )".format(plugin, key, value))
                             if plugin not in to_remove:
                                 to_remove.append(plugin)
                             if plugins_info.get(plugin) is not None:
