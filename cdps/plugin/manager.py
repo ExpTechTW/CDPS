@@ -137,7 +137,7 @@ class Plugin():
                         if plugin not in to_remove:
                             to_remove.append(plugin)
                         if self.plugins_info.get(plugin) is not None:
-                            del self.self.plugins_info[plugin]
+                            del self.plugins_info[plugin]
         for plugin in to_remove:
             self.all_plugins.remove(plugin)
 
