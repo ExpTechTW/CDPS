@@ -1,24 +1,9 @@
 {
     "last_update_time":"2024-06-04 22:00",
-    "tag_list": {
-        "tool": {
-            "zh": "工具"
-        },
-        "info": {
-            "zh": "資訊"
-        },
-        "api": {
-            "zh": "API"
-        },
-        "manage": {
-            "zh": "管理"
-        }
-    },
     "plugin_list": [
         {
             "name": "color_log",
             "description": "CDPS 的彩色 Log 輸出",
-            "version": "1.0.0",
             "tag": [
                 "info"
             ],
