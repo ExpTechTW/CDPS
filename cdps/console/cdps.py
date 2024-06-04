@@ -27,6 +27,8 @@ class console_cdps():
         if self.args[2]:
             if self.args[2] == "reload":
                 Plugin().reload_load_plugins(self.args[3])
+            elif self.args[2] == "list":
+                self.log.logger.info(Plugin().get_load_list())
             elif self.args[2] == "load":
                 self.log.logger.warning("Not Implemented! ( cdps plugin )")
             elif self.args[2] == "unload":
