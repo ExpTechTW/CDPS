@@ -52,9 +52,11 @@ class Manager:
         if name != "":
             if name not in self.listeners:
                 self.listeners[name] = []
+            elif name in self.listeners:
                 self.listeners[name].append(listener)
         elif event_type not in self.listeners:
             self.listeners[event_type] = []
+        elif event_type in self.listeners:
             self.listeners[event_type].append(listener)
 
     def unregister_listener(self, listener, name = ""):
