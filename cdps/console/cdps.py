@@ -8,7 +8,7 @@ class console_cdps():
         self.loop = True
         self.args = args
         self.log = Log()
-        if self.args[1]:
+        if len(self.args) > 1:
             if self.args[1] == "plugin":
                 self.__plugin__()
             elif self.args[1] == "version":
@@ -24,9 +24,11 @@ class console_cdps():
             self.log.logger.error("Unknow Command! ( cdps )")
 
     def __plugin__(self):
-        if self.args[2]:
+        if len(self.args) > 2:
             if self.args[2] == "reload":
                 Plugin().reload_load_plugins(self.args[3])
+            elif self.args[2] == "list":
+                self.log.logger.info(Plugin().get_load_list())
             elif self.args[2] == "load":
                 self.log.logger.warning("Not Implemented! ( cdps plugin )")
             elif self.args[2] == "unload":
