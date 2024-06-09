@@ -21,3 +21,10 @@ class onCommandEvent(Event):
 
     def __init__(self, command):
         self.command = command
+
+
+class onPluginReloadEvent(Event):
+    """ 當 擴充 將被 重新讀取 """
+
+    def __init__(self, name):
+        self.name = name

@@ -38,3 +38,18 @@ class onServerStartListener(Listener):
     def on_event(self, event):
         print(event.pid)
 ```
+
+### New event_listener
+
+```py
+from cdps.plugin.events import onPluginReloadEvent
+from cdps.plugin.manager import Listener, event_listener
+
+
+@event_listener(onPluginReloadEvent, "這裡可以放擴充名或其他") # 裝飾器
+class onPluginReloadEventListener(Listener):
+    def on_event(self, event):
+        if event.name == "這裡對照上面(這裡可以放擴充名或其他)":
+            event_manager.unregister_listener(onPluginReloadEventListener(), "這裡對照上面(這裡可以放擴充名或其他)") # 解除 裝飾器
+            # 放你的擴充重載前該做的事
+```

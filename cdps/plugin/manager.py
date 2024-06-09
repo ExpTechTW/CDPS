@@ -7,6 +7,7 @@ import sys
 import threading
 import zipfile
 
+from cdps.plugin.events import onPluginReloadEvent
 from cdps.utils.logger import Log
 from cdps.utils.version import Version
 
@@ -18,7 +19,7 @@ class Listener:
         raise NotImplementedError("You must implement the on_event method.")
 
 
-def event_listener(event_type):
+def event_listener(event_type, name = ""):
     def decorator(listener_class):
         if not hasattr(listener_class, 'on_event'):
             raise ValueError(
@@ -27,7 +28,7 @@ def event_listener(event_type):
         manager = Manager._instance
         if manager is None:
             manager = Manager()
-        manager.register_listener(listener_class())
+        manager.register_listener(listener_class(), name)
 
         return listener_class
     return decorator
@@ -42,22 +43,43 @@ class Manager:
             cls._instance.listeners = {}
         return cls._instance
 
-    def register_listener(self, listener):
+    def register_listener(self, listener, name = ""):
         event_type = getattr(listener, 'event', None)
         if event_type is None:
             raise ValueError(
                 "Listener must have an 'event' attribute defined.")
 
-        if event_type not in self.listeners:
+        if name != "":
+            if name not in self.listeners:
+                self.listeners[name] = []
+            elif name in self.listeners:
+                self.listeners[name].append(listener)
+        elif event_type not in self.listeners:
             self.listeners[event_type] = []
-        self.listeners[event_type].append(listener)
+        elif event_type in self.listeners:
+            self.listeners[event_type].append(listener)
 
-    def call_event(self, event):
+    def unregister_listener(self, listener, name = ""):
+        event_type = getattr(listener, 'event', None)
+        if event_type is None:
+            raise ValueError(
+                "Listener must have an 'event' attribute defined.")
+
+        if name != "":
+            if name in self.listeners:
+                self.listeners[name] = []
+        elif event_type in self.listeners:
+            self.listeners[event_type] = []
+
+    def call_event(self, event, name = ""):
         event_type = type(event)
-        if event_type in self.listeners:
+        if name != "":
+            if name in self.listeners:
+                for listener in self.listeners[name]:
+                    listener.on_event(event)
+        elif event_type in self.listeners:
             for listener in self.listeners[event_type]:
                 listener.on_event(event)
-
 
 class Plugin():
     _instance = None
@@ -207,6 +229,7 @@ class Plugin():
             self.log.logger.error(f"Error Loading Plugins: {e}")
 
     def reload_load_plugins(self, name):
+        self.event_manager.call_event(onPluginReloadEvent(name), name)
         if name in self.loaded_plugins_list:
             config_path = os.path.join("./config/", "{}.json".format(name))
             full_path = os.path.join(directory_path, name)
